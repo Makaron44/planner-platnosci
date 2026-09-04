@@ -5,11 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Planner Płatności 2026-2027</title>
   
-  <!-- Manifest PWA i ikony -->
   <meta name="theme-color" content="#059669">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="apple-touch-icon" href="https://placehold.co/192x192/059669/white?text=P">
+  <link rel="manifest" href='data:application/manifest+json,{"name":"Planner Płatności","short_name":"Planner","start_url":".","display":"standalone","background_color":"#ffffff","theme_color":"#059669","icons":[{"src":"https://placehold.co/192x192/059669/white?text=P","sizes":"192x192","type":"image/png"}]}'>
   
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -18,35 +18,34 @@
       theme: {
         extend: {
           fontFamily: { sans: ['Inter', 'sans-serif'] },
-          colors: { slate: { 850: '#151e2e' } }
+          colors: { slate: { 850: '#151e2e', 900: '#0f172a', 950: '#020617' } }
         }
       }
     }
   </script>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
     body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
     
-    /* Ukrywanie pasków przewijania, zachowując funkcjonalność */
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     
-    /* Płynne przejścia dla trybu ciemnego */
     * { transition: background-color 0.2s ease, border-color 0.2s ease; }
     
-    /* Bezpieczne obszary dla iPhone'a (Notch/Wyspa) */
     .safe-padding-top { padding-top: env(safe-area-inset-top); }
     .safe-padding-bottom { padding-bottom: env(safe-area-inset-bottom); }
+
+    /* Wymuszony brak pływania na boki na telefonie */
+    html, body { overflow-x: hidden; width: 100%; position: relative; }
   </style>
 </head>
 <body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 min-h-screen flex flex-col safe-padding-bottom">
 
-  <!-- Górny nagłówek z logo i akcjami -->
   <header class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-40 safe-padding-top shadow-sm">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       
+      <!-- Wiersz 1: Logo i Akcje -->
       <div class="flex items-center justify-between h-16 gap-4">
-        <!-- Lewa strona: Hamburger (Mobile) + Logo -->
         <div class="flex items-center gap-3">
           <button onclick="toggleMobileMenu()" class="sm:hidden p-2 -ml-2 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white rounded-lg">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
@@ -60,547 +59,363 @@
           </div>
         </div>
 
-        <!-- Środek: Przełącznik miesięcy (Zawsze widoczny, na środku lub z boku w mobile) -->
-        <div class="flex items-center gap-1 sm:gap-2 bg-slate-100 dark:bg-slate-800 p-1 rounded-lg border border-slate-200 dark:border-slate-700 flex-1 sm:flex-none justify-center">
-          <button onclick="changeMonth(-1)" class="p-1.5 sm:p-2 hover:bg-white dark:hover:bg-slate-700 rounded-md transition text-slate-600 dark:text-slate-300 shadow-sm"><svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg></button>
-          <select id="monthSelector" onchange="switchMonth(this.value)" class="bg-transparent border-none text-sm sm:text-base font-bold text-slate-800 dark:text-slate-100 focus:ring-0 cursor-pointer text-center w-full sm:w-auto appearance-none px-2">
-            <!-- Opcje generowane w JS -->
-          </select>
-          <button onclick="changeMonth(1)" class="p-1.5 sm:p-2 hover:bg-white dark:hover:bg-slate-700 rounded-md transition text-slate-600 dark:text-slate-300 shadow-sm"><svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></button>
-        </div>
-
-        <!-- Prawa strona: Narzędzia -->
         <div class="flex items-center gap-2">
-          
-          <!-- Tryb Ciemny -->
           <button onclick="toggleTheme()" class="p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 dark:text-slate-400 rounded-full transition" title="Tryb jasny/ciemny">
             <svg id="themeIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
           </button>
-
-          <!-- Przycisk PWA -->
-          <button id="pwaInstallBtn" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-emerald-700 bg-emerald-50 dark:bg-emerald-900/30 dark:text-emerald-400 rounded-lg hover:bg-emerald-100 dark:hover:bg-emerald-800/50 transition">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg> Zainstaluj
-          </button>
-
-          <!-- Przycisk Chmury -->
-          <button onclick="openModal('syncModal')" class="hidden sm:inline-flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-emerald-800 bg-emerald-100 dark:bg-emerald-900/50 dark:text-emerald-300 rounded-lg hover:bg-emerald-200 transition border border-emerald-200 dark:border-emerald-800">
+          <button onclick="openModal('syncModal')" class="flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-emerald-800 bg-emerald-100 dark:bg-emerald-900/50 dark:text-emerald-300 rounded-lg hover:bg-emerald-200 transition border border-emerald-200 dark:border-emerald-800">
             <div id="cloudStatusDot" class="w-2 h-2 rounded-full bg-slate-400"></div>
-            <span id="cloudStatusText">Chmura</span>
+            <span id="cloudStatusText">Chmura Supabase</span>
           </button>
-
-          <!-- Nowa Płatność (Na mobile jako + , na PC jako tekst) -->
-          <button onclick="openAddModal()" class="flex items-center justify-center bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg shadow-md shadow-emerald-600/20 transition px-3 py-2 sm:px-4 sm:py-2">
+          <button onclick="openAddModal()" class="flex items-center justify-center bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg shadow-md transition px-3 py-1.5 sm:px-4 sm:py-2">
             <svg class="w-5 h-5 sm:mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
             <span class="hidden sm:inline text-sm">Dodaj</span>
           </button>
+        </div>
+      </div>
 
+      <!-- Wiersz 2: Nawigacja i Miesiąc (Zoptymalizowane pod Mobile) -->
+      <div class="flex items-center justify-between py-2 border-t border-slate-100 dark:border-slate-800 gap-4">
+        
+        <!-- Pasek Zakładek (Przewijany na mobile) -->
+        <div class="flex-1 overflow-x-auto no-scrollbar">
+          <nav class="flex space-x-6 min-w-max px-1" aria-label="Tabs">
+            <button id="tab-dashboard" onclick="switchTab('dashboard')" class="border-emerald-600 text-emerald-700 dark:text-emerald-400 whitespace-nowrap py-2 border-b-2 font-bold text-sm transition flex items-center gap-2">Pulpit</button>
+            <button id="tab-transactions" onclick="switchTab('transactions')" class="border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-300 whitespace-nowrap py-2 border-b-2 font-semibold text-sm transition flex items-center gap-2">Płatności <span id="tabCountBadge" class="ml-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 py-0.5 px-2 rounded-full text-xs">0</span></button>
+            <button id="tab-calendar" onclick="switchTab('calendar')" class="border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-300 whitespace-nowrap py-2 border-b-2 font-semibold text-sm transition flex items-center gap-2">Kalendarz</button>
+            <button id="tab-yearly" onclick="switchTab('yearly')" class="border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-300 whitespace-nowrap py-2 border-b-2 font-semibold text-sm transition flex items-center gap-2">Roczne</button>
+            <button id="tab-customize" onclick="switchTab('customize')" class="border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-300 whitespace-nowrap py-2 border-b-2 font-semibold text-sm transition flex items-center gap-2">Kategorie</button>
+          </nav>
+        </div>
+
+        <!-- Przełącznik miesięcy -->
+        <div class="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-lg border border-slate-200 dark:border-slate-700 shrink-0">
+          <button onclick="changeMonth(-1)" class="p-1 hover:bg-white dark:hover:bg-slate-700 rounded-md transition text-slate-600 dark:text-slate-300"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg></button>
+          <select id="monthSelector" onchange="switchMonth(this.value)" class="bg-transparent border-none text-sm font-bold text-slate-800 dark:text-slate-100 focus:ring-0 cursor-pointer appearance-none px-2 text-center">
+            <!-- Opcje generowane w JS -->
+          </select>
+          <button onclick="changeMonth(1)" class="p-1 hover:bg-white dark:hover:bg-slate-700 rounded-md transition text-slate-600 dark:text-slate-300"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></button>
         </div>
       </div>
     </div>
   </header>
 
-  <!-- Pasek Zakładek (Tylko Desktop - dla zachowania wygody) -->
-  <div class="hidden sm:block bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm overflow-x-auto no-scrollbar">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <nav class="flex space-x-8" aria-label="Tabs">
-        <button id="tab-dashboard" onclick="switchTab('dashboard')" class="border-emerald-600 text-emerald-700 dark:text-emerald-400 whitespace-nowrap py-3 px-1 border-b-2 font-bold text-sm transition flex items-center gap-2">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-          Pulpit
-        </button>
-        <button id="tab-transactions" onclick="switchTab('transactions')" class="border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white whitespace-nowrap py-3 px-1 border-b-2 font-semibold text-sm transition flex items-center gap-2">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-          Płatności <span id="tabCountBadge" class="ml-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 py-0.5 px-2 rounded-full text-xs">0</span>
-        </button>
-        <button id="tab-calendar" onclick="switchTab('calendar')" class="border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white whitespace-nowrap py-3 px-1 border-b-2 font-semibold text-sm transition flex items-center gap-2">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-          Kalendarz
-        </button>
-        <button id="tab-yearly" onclick="switchTab('yearly')" class="border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white whitespace-nowrap py-3 px-1 border-b-2 font-semibold text-sm transition flex items-center gap-2">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-          Roczne Zestawienie
-        </button>
-        <button id="tab-customize" onclick="switchTab('customize')" class="border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white whitespace-nowrap py-3 px-1 border-b-2 font-semibold text-sm transition flex items-center gap-2">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
-          Kategorie
-        </button>
-      </nav>
-    </div>
-  </div>
-
-  <!-- Główna zawartość -->
   <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
 
-    <!-- KPI Cards (Widoczne na Dashboardzie i Płatnościach dla stałego podglądu) -->
+    <!-- KPI Cards -->
     <div id="kpi-container" class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-      <!-- Total -->
       <div class="bg-white dark:bg-slate-900 rounded-xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden">
-        <div class="text-slate-500 dark:text-slate-400 mb-1 flex items-center justify-between">
-          <span class="text-[10px] sm:text-xs font-semibold uppercase tracking-wider">Razem do zapłaty</span>
-        </div>
+        <div class="text-slate-500 dark:text-slate-400 mb-1 flex items-center justify-between"><span class="text-[10px] sm:text-xs font-semibold uppercase tracking-wider">Razem do zapłaty</span></div>
         <div class="text-lg sm:text-2xl font-black text-slate-900 dark:text-white" id="kpiTotal">0,00 zł</div>
         <p class="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 mt-1" id="kpiCount">Liczba pozycji: 0</p>
       </div>
-
-      <!-- Paid -->
       <div class="bg-white dark:bg-slate-900 rounded-xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden">
-        <div class="text-slate-500 dark:text-slate-400 mb-1 flex items-center justify-between">
-          <span class="text-[10px] sm:text-xs font-semibold uppercase tracking-wider">Już Opłacone</span>
-        </div>
+        <div class="text-slate-500 dark:text-slate-400 mb-1 flex items-center justify-between"><span class="text-[10px] sm:text-xs font-semibold uppercase tracking-wider">Już Opłacone</span></div>
         <div class="text-lg sm:text-2xl font-black text-emerald-600 dark:text-emerald-400" id="kpiPaid">0,00 zł</div>
-        <div class="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-1.5 mt-2">
-          <div class="bg-emerald-500 h-1.5 rounded-full" id="kpiProgress" style="width: 0%"></div>
-        </div>
+        <div class="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-1.5 mt-2"><div class="bg-emerald-500 h-1.5 rounded-full" id="kpiProgress" style="width: 0%"></div></div>
       </div>
-
-      <!-- Pending -->
       <div class="bg-white dark:bg-slate-900 rounded-xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden">
-        <div class="text-slate-500 dark:text-slate-400 mb-1 flex items-center justify-between">
-          <span class="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-amber-600 dark:text-amber-500">Pozostało</span>
-        </div>
+        <div class="text-slate-500 dark:text-slate-400 mb-1 flex items-center justify-between"><span class="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-amber-600 dark:text-amber-500">Pozostało</span></div>
         <div class="text-lg sm:text-2xl font-black text-amber-600 dark:text-amber-500" id="kpiPending">0,00 zł</div>
       </div>
-
-      <!-- Next Due -->
       <div class="bg-white dark:bg-slate-900 rounded-xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden">
-        <div class="text-slate-500 dark:text-slate-400 mb-1 flex items-center justify-between">
-          <span class="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">Najbliższe</span>
-        </div>
+        <div class="text-slate-500 dark:text-slate-400 mb-1 flex items-center justify-between"><span class="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">Najbliższe</span></div>
         <div class="text-sm sm:text-base font-bold text-slate-800 dark:text-slate-200 truncate" id="kpiNextDue">Brak pilnych</div>
         <p class="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 mt-1 truncate" id="kpiNextDueSub">Wszystko pod kontrolą</p>
       </div>
     </div>
 
-    <!-- SEKCJA: PULPIT (Wykresy i Najbliższe) -->
+    <!-- SEKCJA: PULPIT -->
     <section id="section-dashboard" class="space-y-6 block">
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
-        <!-- Wykres Wydatków (Kategorie) -->
         <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-6 border border-slate-200 dark:border-slate-800 shadow-sm lg:col-span-2">
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-            <h2 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-              <div class="w-3 h-3 rounded-full bg-emerald-500"></div>
-              Wydatki wg kategorii
-            </h2>
-            <button onclick="switchTab('customize')" class="text-sm font-medium text-emerald-600 dark:text-emerald-400 hover:underline">Edytuj kategorie &rarr;</button>
+          <div class="flex items-center justify-between mb-6">
+            <h2 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white">Wydatki wg kategorii</h2>
           </div>
           <div id="categoryChartContainer" class="space-y-4 max-h-[400px] overflow-y-auto pr-2 no-scrollbar">
-            <!-- Paski kategorii -->
+            <!-- Paski kategorii generowane w JS -->
           </div>
         </div>
-
-        <!-- Najbliższe płatności -->
         <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-6 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col">
-          <h2 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
-            <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-            Nadchodzące terminy
-          </h2>
+          <h2 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white mb-6">Nadchodzące terminy</h2>
           <div id="upcomingList" class="flex-1 space-y-3 overflow-y-auto no-scrollbar">
-            <!-- Lista rachunków -->
+            <!-- Lista rachunków generowana w JS -->
           </div>
         </div>
-
       </div>
     </section>
 
-    <!-- SEKCJA: TRANSAKCJE (Widok Główny - Karty mobilne i Tabela PC) -->
+    <!-- SEKCJA: TRANSAKCJE -->
     <section id="section-transactions" class="space-y-4 hidden">
-      
-      <!-- Pasek Narzędzi Transakcji -->
       <div class="flex flex-col sm:flex-row gap-3 justify-between">
         <div class="relative flex-1 max-w-md">
           <svg class="w-5 h-5 absolute left-3 top-2.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-          <input type="text" id="searchInput" placeholder="Szukaj rachunku..." oninput="renderTransactions()" class="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 dark:text-white transition">
+          <input type="text" id="searchInput" placeholder="Szukaj rachunku..." oninput="renderTransactions()" class="w-full pl-10 pr-4 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 dark:text-white outline-none transition">
         </div>
         <div class="flex gap-2 w-full sm:w-auto">
-          <select id="statusFilter" onchange="renderTransactions()" class="flex-1 sm:flex-none py-2.5 px-3 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-sm font-medium dark:text-white">
-            <option value="ALL">Wszystkie statusy</option>
-            <option value="PENDING">Do zapłaty</option>
-            <option value="PAID">Opłacone</option>
-            <option value="AUTOPAY">Autopłatność</option>
+          <select id="statusFilter" onchange="renderTransactions()" class="flex-1 sm:flex-none py-2 px-3 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-sm font-medium dark:text-white outline-none">
+            <option value="ALL">Wszystkie</option><option value="PENDING">Do zapłaty</option><option value="PAID">Opłacone</option>
           </select>
-          <button onclick="copyToNextMonth()" class="flex-1 sm:flex-none px-4 py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-xl text-sm font-bold transition whitespace-nowrap border border-slate-200 dark:border-slate-700">
+          <button onclick="copyToNextMonth()" class="flex-1 sm:flex-none px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-xl text-sm font-bold transition whitespace-nowrap border border-slate-200 dark:border-slate-700">
             Kopiuj na kolejny m-c
           </button>
         </div>
       </div>
 
-      <!-- KARTY (WIDOK MOBILNY) - Ukryte na dużych ekranach -->
-      <div id="transactionsCards" class="grid grid-cols-1 gap-3 sm:hidden">
-        <!-- Renderowane przez JS -->
-      </div>
+      <!-- KARTY (MOBILE) -->
+      <div id="transactionsCards" class="grid grid-cols-1 gap-3 sm:hidden"></div>
 
-      <!-- TABELA (WIDOK DESKTOP) - Ukryta na telefonach -->
+      <!-- TABELA (DESKTOP) -->
       <div class="hidden sm:block bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm overflow-hidden">
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-sm text-slate-600 dark:text-slate-300">
-            <thead class="bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 text-xs uppercase tracking-wider font-semibold border-b border-slate-200 dark:border-slate-800">
-              <tr>
-                <th class="px-6 py-4">Status</th>
-                <th class="px-6 py-4">Dzień</th>
-                <th class="px-6 py-4">Nazwa & Kategoria</th>
-                <th class="px-6 py-4 text-right">Kwota</th>
-                <th class="px-6 py-4">Konto / Metoda</th>
-                <th class="px-6 py-4 text-right">Akcje</th>
-              </tr>
-            </thead>
-            <tbody id="transactionsTableBody" class="divide-y divide-slate-100 dark:divide-slate-800/50">
-              <!-- Renderowane przez JS -->
-            </tbody>
-          </table>
-        </div>
-      </div>
-      
-    </section>
-
-    <!-- INNE SEKCJE (Kalendarz, Roczne, Kategorie) -->
-    
-    <section id="section-calendar" class="hidden">
-      <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-6 border border-slate-200 dark:border-slate-800 shadow-sm">
-        <div class="flex justify-between items-center mb-6">
-          <h2 class="text-lg font-bold text-slate-900 dark:text-white">Kalendarz Płatności</h2>
-          <div class="text-sm font-medium text-emerald-600 dark:text-emerald-400" id="calendarMonthName">Wrzesień 2026</div>
-        </div>
-        <div class="grid grid-cols-7 gap-1 sm:gap-2 mb-2 text-center text-xs font-bold text-slate-400 uppercase">
-          <div>Pn</div><div>Wt</div><div>Śr</div><div>Cz</div><div>Pt</div><div>Sb</div><div>Nd</div>
-        </div>
-        <div id="calendarGrid" class="grid grid-cols-7 gap-1 sm:gap-2">
-          <!-- Dni kalendarza generowane przez JS -->
-        </div>
-      </div>
-    </section>
-
-    <section id="section-yearly" class="hidden space-y-6">
-      <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200 dark:border-slate-800 shadow-sm overflow-x-auto">
-        <div class="flex justify-between items-center mb-4 min-w-[600px]">
-          <h2 class="text-lg font-bold text-slate-900 dark:text-white">Roczne zestawienie (09.2026 - 09.2027)</h2>
-          <button onclick="exportYearlySummaryCSV()" class="px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-bold transition">
-            Pobierz CSV
-          </button>
-        </div>
-        <table class="w-full text-left text-sm whitespace-nowrap min-w-[600px]">
-          <thead class="bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 font-bold uppercase text-[10px] border-b border-slate-200 dark:border-slate-700">
-            <tr>
-              <th class="p-3">Miesiąc</th>
-              <th class="p-3 text-center">Rachunki</th>
-              <th class="p-3 text-right">Suma Kwot</th>
-              <th class="p-3 text-right">Opłacone</th>
-              <th class="p-3 text-center">% Realizacji</th>
-            </tr>
+        <table class="w-full text-left text-sm text-slate-600 dark:text-slate-300">
+          <thead class="bg-slate-50 dark:bg-slate-800/50 text-slate-500 text-xs uppercase tracking-wider font-semibold border-b border-slate-200 dark:border-slate-800">
+            <tr><th class="px-6 py-4">Status</th><th class="px-6 py-4">Dzień</th><th class="px-6 py-4">Nazwa & Kategoria</th><th class="px-6 py-4 text-right">Kwota</th><th class="px-6 py-4 text-right">Akcje</th></tr>
           </thead>
-          <tbody id="yearlyTableBody" class="divide-y divide-slate-100 dark:divide-slate-800 text-slate-700 dark:text-slate-300">
-            <!-- JS -->
-          </tbody>
+          <tbody id="transactionsTableBody" class="divide-y divide-slate-100 dark:divide-slate-800/50"></tbody>
         </table>
       </div>
     </section>
 
-    <section id="section-customize" class="hidden">
-      <!-- Ustawienia kategorii analogiczne do poprzednich, skrócone dla czytelności -->
-      <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm text-center">
-        <h2 class="text-xl font-bold mb-2">Konfiguracja wkrótce...</h2>
-        <p class="text-slate-500">Aby dodać nową kategorię, w oknie dodawania płatności po prostu wpisz nową nazwę - system sam ją zapisze.</p>
+    <!-- SEKCJA: KALENDARZ -->
+    <section id="section-calendar" class="hidden">
+      <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-6 border border-slate-200 dark:border-slate-800 shadow-sm">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-lg font-bold text-slate-900 dark:text-white">Kalendarz Płatności</h2>
+          <div class="text-sm font-medium text-emerald-600 dark:text-emerald-400" id="calendarMonthName"></div>
+        </div>
+        <div class="grid grid-cols-7 gap-1 sm:gap-2 mb-2 text-center text-xs font-bold text-slate-400 uppercase">
+          <div>Pn</div><div>Wt</div><div>Śr</div><div>Cz</div><div>Pt</div><div>Sb</div><div>Nd</div>
+        </div>
+        <div id="calendarGrid" class="grid grid-cols-7 gap-1 sm:gap-2 auto-rows-fr">
+          <!-- Siatka kalendarza JS -->
+        </div>
       </div>
     </section>
 
+    <!-- SEKCJA: ROCZNE ZESTAWIENIE -->
+    <section id="section-yearly" class="hidden">
+      <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200 dark:border-slate-800 shadow-sm overflow-x-auto">
+        <div class="flex justify-between items-center mb-4 min-w-[600px]">
+          <h2 class="text-lg font-bold text-slate-900 dark:text-white">Zestawienie Roczne (2026-2027)</h2>
+        </div>
+        <table class="w-full text-left text-sm whitespace-nowrap min-w-[600px]">
+          <thead class="bg-slate-50 dark:bg-slate-800 text-slate-500 font-bold uppercase text-[10px] border-b border-slate-200 dark:border-slate-700">
+            <tr><th class="p-3">Miesiąc</th><th class="p-3 text-center">Rachunki</th><th class="p-3 text-right">Razem Kwota</th><th class="p-3 text-right">Opłacone</th><th class="p-3 text-right">Do zapłaty</th></tr>
+          </thead>
+          <tbody id="yearlyTableBody" class="divide-y divide-slate-100 dark:divide-slate-800"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- SEKCJA: KATEGORIE -->
+    <section id="section-customize" class="hidden">
+      <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm">
+        <h2 class="text-lg font-bold text-slate-900 dark:text-white mb-4">Zarządzanie kategoriami</h2>
+        <div class="flex gap-2 mb-6 max-w-md">
+          <input type="text" id="newCategoryInput" placeholder="Nowa kategoria..." class="flex-1 px-4 py-2 border rounded-xl dark:bg-slate-800 dark:border-slate-700 dark:text-white">
+          <button onclick="addCategory()" class="px-4 py-2 bg-emerald-600 text-white font-bold rounded-xl">Dodaj</button>
+        </div>
+        <div id="categoriesList" class="flex flex-wrap gap-2"></div>
+      </div>
+    </section>
   </main>
 
-  <!-- MODAL: Menu Mobilne (Hamburger Drawer) -->
+  <!-- MODAL: Menu Mobilne Hamburger -->
   <div id="mobileMenuModal" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm hidden flex transition-opacity duration-300">
     <div class="bg-white dark:bg-slate-900 w-72 h-full shadow-2xl border-r border-slate-200 dark:border-slate-800 flex flex-col transform transition-transform duration-300 -translate-x-full" id="mobileDrawer">
-      
       <div class="p-5 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50">
-         <div>
-           <span class="block font-black text-slate-900 dark:text-white text-lg">Menu</span>
-           <span class="block text-xs text-slate-500 font-medium mt-1" id="mobileCloudStatus">Chmura: Rozłączono</span>
-         </div>
-         <button onclick="toggleMobileMenu()" class="text-slate-500 hover:text-slate-800 dark:hover:text-white p-2 rounded-lg bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-slate-700">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-         </button>
+         <span class="block font-black text-slate-900 dark:text-white text-lg">Menu</span>
+         <button onclick="toggleMobileMenu()" class="text-slate-500 p-2 rounded-lg bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-slate-700"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
       </div>
-
-      <nav class="p-4 space-y-2 flex-1 overflow-y-auto">
-         <button onclick="switchTab('dashboard'); toggleMobileMenu();" class="w-full text-left px-4 py-3.5 rounded-xl font-bold text-slate-700 dark:text-slate-300 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 hover:text-emerald-700 dark:hover:text-emerald-400 transition flex items-center gap-3 border border-transparent">
-           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-           Pulpit
-         </button>
-         <button onclick="switchTab('transactions'); toggleMobileMenu();" class="w-full text-left px-4 py-3.5 rounded-xl font-bold text-slate-700 dark:text-slate-300 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 hover:text-emerald-700 dark:hover:text-emerald-400 transition flex items-center gap-3">
-           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-           Lista Płatności
-         </button>
-         <button onclick="switchTab('calendar'); toggleMobileMenu();" class="w-full text-left px-4 py-3.5 rounded-xl font-bold text-slate-700 dark:text-slate-300 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 hover:text-emerald-700 dark:hover:text-emerald-400 transition flex items-center gap-3">
-           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-           Kalendarz
-         </button>
-         <button onclick="switchTab('yearly'); toggleMobileMenu();" class="w-full text-left px-4 py-3.5 rounded-xl font-bold text-slate-700 dark:text-slate-300 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 hover:text-emerald-700 dark:hover:text-emerald-400 transition flex items-center gap-3">
-           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-           Roczne Zestawienie
-         </button>
+      <nav class="p-4 space-y-2 flex-1">
+         <button onclick="switchTab('dashboard'); toggleMobileMenu();" class="w-full text-left px-4 py-3 rounded-xl font-bold text-slate-700 dark:text-slate-300 hover:bg-emerald-50 dark:hover:bg-slate-800">Pulpit</button>
+         <button onclick="switchTab('transactions'); toggleMobileMenu();" class="w-full text-left px-4 py-3 rounded-xl font-bold text-slate-700 dark:text-slate-300 hover:bg-emerald-50 dark:hover:bg-slate-800">Lista Płatności</button>
+         <button onclick="switchTab('calendar'); toggleMobileMenu();" class="w-full text-left px-4 py-3 rounded-xl font-bold text-slate-700 dark:text-slate-300 hover:bg-emerald-50 dark:hover:bg-slate-800">Kalendarz</button>
+         <button onclick="switchTab('yearly'); toggleMobileMenu();" class="w-full text-left px-4 py-3 rounded-xl font-bold text-slate-700 dark:text-slate-300 hover:bg-emerald-50 dark:hover:bg-slate-800">Roczne Zestawienie</button>
+         <button onclick="switchTab('customize'); toggleMobileMenu();" class="w-full text-left px-4 py-3 rounded-xl font-bold text-slate-700 dark:text-slate-300 hover:bg-emerald-50 dark:hover:bg-slate-800">Kategorie</button>
       </nav>
-
-      <!-- Przyciski akcji na dole menu -->
-      <div class="p-4 border-t border-slate-100 dark:border-slate-800 space-y-3">
-         <button onclick="openModal('syncModal'); toggleMobileMenu();" class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-emerald-100 dark:bg-emerald-900 text-emerald-800 dark:text-emerald-300 font-bold rounded-xl">
-           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"/></svg>
-           Ustawienia Chmury
-         </button>
-         <button onclick="exportPlannerCSV(); toggleMobileMenu();" class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold rounded-xl border border-slate-200 dark:border-slate-700">
-           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-           Eksportuj Plik
-         </button>
-      </div>
     </div>
   </div>
 
-  <!-- MODAL: Synchronizacja w chmurze (KVDB) -->
+  <!-- MODAL: Chmura Supabase -->
   <div id="syncModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
     <div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-md shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden transform transition-all scale-95 opacity-0" id="syncModalInner">
-      
       <div class="p-5 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50">
-        <h3 class="text-lg font-black text-slate-900 dark:text-white flex items-center gap-2">
-          <svg class="w-6 h-6 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"/></svg>
-          Chmura
-        </h3>
-        <button onclick="closeModal('syncModal')" class="text-slate-400 hover:text-slate-600 dark:hover:text-white bg-white dark:bg-slate-800 p-1.5 rounded-lg border border-slate-200 dark:border-slate-700">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-        </button>
+        <h3 class="text-lg font-black text-slate-900 dark:text-white">Chmura Supabase</h3>
+        <button onclick="closeModal('syncModal')" class="text-slate-400 p-1.5 rounded-lg border bg-white dark:bg-slate-800"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
       </div>
-
-      <div class="p-6 space-y-5">
+      <div class="p-6 space-y-4">
+        <p class="text-xs text-slate-500 dark:text-slate-400">Podaj dane do swojego projektu Supabase. Wymagana jest tabela <code class="bg-slate-100 dark:bg-slate-800 px-1 rounded">planner_data</code> z kolumnami: <code class="bg-slate-100 dark:bg-slate-800 px-1 rounded">sync_id</code> (text) oraz <code class="bg-slate-100 dark:bg-slate-800 px-1 rounded">data</code> (jsonb).</p>
         
-        <div class="bg-emerald-50 dark:bg-emerald-900/20 text-emerald-800 dark:text-emerald-300 p-3 rounded-xl border border-emerald-100 dark:border-emerald-800/50 text-sm flex items-start gap-3">
-           <svg class="w-5 h-5 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-           <p class="leading-relaxed">Zapisz ten Kod Profilu lub użyj przycisku kopiowania, aby wkleić kod na drugim telefonie lub komputerze. Dane połączą się natychmiast!</p>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Twój unikalny kod synchronizacji (Sync ID):</label>
+          <input type="text" id="supaSyncId" class="w-full px-3 py-2 border rounded-lg bg-slate-50 dark:bg-slate-950 dark:border-slate-700 dark:text-white uppercase font-bold" placeholder="NP: MOJ-PLANNER-1">
         </div>
-
-        <div class="space-y-2">
-          <label class="block font-bold text-slate-700 dark:text-slate-300 text-xs uppercase tracking-wider">Twój Unikalny Kod Profilu:</label>
-          <div class="flex gap-2">
-            <input type="text" id="inputSyncCode" class="w-full px-4 py-3 text-lg font-black text-slate-900 dark:text-white bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-center focus:ring-2 focus:ring-emerald-500 uppercase tracking-widest" value="" placeholder="NP: DOM-2026" />
-          </div>
-          <p id="syncModalStatus" class="text-xs text-center font-semibold text-emerald-600 dark:text-emerald-400 mt-2">Sprawdzanie statusu...</p>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Supabase URL:</label>
+          <input type="text" id="supaUrl" class="w-full px-3 py-2 border rounded-lg bg-slate-50 dark:bg-slate-950 dark:border-slate-700 dark:text-white text-sm" placeholder="https://xyz.supabase.co">
         </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-          <button onclick="applySyncCode()" class="w-full px-4 py-3 text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-md transition">
-            Zapisz Kod
-          </button>
-          <button onclick="copySyncLink()" class="w-full px-4 py-3 text-sm font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-900/50 hover:bg-emerald-200 dark:hover:bg-emerald-800 rounded-xl transition flex items-center justify-center gap-2">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
-            Kopiuj Link dla Telefonu
-          </button>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Supabase Anon Key:</label>
+          <input type="password" id="supaKey" class="w-full px-3 py-2 border rounded-lg bg-slate-50 dark:bg-slate-950 dark:border-slate-700 dark:text-white text-sm" placeholder="eyJhbGciOiJIUzI1NiIsInR5c...">
         </div>
-
-        <div class="pt-4 mt-4 border-t border-slate-100 dark:border-slate-800 text-center">
-          <button onclick="generateRandomSyncCode()" class="text-xs text-slate-500 hover:text-slate-800 dark:hover:text-slate-300 underline font-medium">
-            Wygeneruj całkowicie nowy, bezpieczny kod
-          </button>
-        </div>
-
+        <p id="syncModalStatus" class="text-xs font-bold text-center text-slate-500">Oczekuje na zapis...</p>
+        <button onclick="saveSupabaseConfig()" class="w-full px-4 py-3 bg-emerald-600 text-white font-bold rounded-xl shadow-md">Zapisz i Połącz</button>
       </div>
     </div>
   </div>
 
-  <!-- Toast Powiadomienia -->
+  <!-- MODAL: Dodawanie Rachunku -->
+  <div id="addModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-sm shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden transform transition-all scale-95 opacity-0" id="addModalInner">
+      <div class="p-5 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50">
+        <h3 class="text-lg font-black text-slate-900 dark:text-white">Nowy Rachunek</h3>
+        <button onclick="closeModal('addModal')" class="text-slate-400 p-1.5 rounded-lg border bg-white dark:bg-slate-800"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+      </div>
+      <div class="p-5 space-y-4">
+        <div><label class="block text-xs font-bold mb-1 dark:text-slate-300">Nazwa</label><input type="text" id="addName" class="w-full px-3 py-2 border rounded-lg dark:bg-slate-900 dark:border-slate-700 dark:text-white"></div>
+        <div class="grid grid-cols-2 gap-3">
+          <div><label class="block text-xs font-bold mb-1 dark:text-slate-300">Kwota (zł)</label><input type="number" id="addAmount" step="0.01" class="w-full px-3 py-2 border rounded-lg dark:bg-slate-900 dark:border-slate-700 dark:text-white"></div>
+          <div><label class="block text-xs font-bold mb-1 dark:text-slate-300">Dzień m-ca</label><input type="number" min="1" max="31" id="addDay" class="w-full px-3 py-2 border rounded-lg dark:bg-slate-900 dark:border-slate-700 dark:text-white"></div>
+        </div>
+        <div>
+          <label class="block text-xs font-bold mb-1 dark:text-slate-300">Kategoria</label>
+          <select id="addCategorySel" class="w-full px-3 py-2 border rounded-lg dark:bg-slate-900 dark:border-slate-700 dark:text-white"></select>
+        </div>
+        <button onclick="saveNewBill()" class="w-full px-4 py-3 bg-emerald-600 text-white font-bold rounded-xl">Zapisz</button>
+      </div>
+    </div>
+  </div>
+
   <div id="toastContainer" class="fixed bottom-5 left-1/2 transform -translate-x-1/2 z-50 flex flex-col gap-2"></div>
 
-  <!-- Główny Skrypt JS -->
   <script>
-    // --- TRYB CIEMNY (DARK MODE) ---
-    function initTheme() {
-      if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-      }
-    }
-    initTheme();
-
-    function toggleTheme() {
-      const html = document.documentElement;
-      if (html.classList.contains('dark')) {
-        html.classList.remove('dark');
-        localStorage.setItem('theme', 'light');
-      } else {
-        html.classList.add('dark');
-        localStorage.setItem('theme', 'dark');
-      }
-    }
-
-    // --- STAN I ZMIENNE APLIKACJI ---
-    const STORAGE_PREFIX = 'moje_platnosci_2026_2027_';
-    
-    // Miesiące cyklu
+    // Konfiguracja i Stan
+    const STORAGE_PREFIX = 'moje_platnosci_2026_';
     const MONTHS = [
-      { key: '2026-09', label: 'Wrzesień 2026' }, { key: '2026-10', label: 'Październik 2026' }, { key: '2026-11', label: 'Listopad 2026' },
-      { key: '2026-12', label: 'Grudzień 2026' }, { key: '2027-01', label: 'Styczeń 2027' }, { key: '2027-02', label: 'Luty 2027' },
-      { key: '2027-03', label: 'Marzec 2027' }, { key: '2027-04', label: 'Kwiecień 2027' }, { key: '2027-05', label: 'Maj 2027' },
-      { key: '2027-06', label: 'Czerwiec 2027' }, { key: '2027-07', label: 'Lipiec 2027' }, { key: '2027-08', label: 'Sierpień 2027' },
-      { key: '2027-09', label: 'Wrzesień 2027' }
+      { key: '2026-09', label: 'Wrzesień 2026', days: 30, startDay: 2 }, // Wtorek=2 (Dla uproszczenia kalendarza używamy JS Date)
+      { key: '2026-10', label: 'Październik 2026' }, { key: '2026-11', label: 'Listopad 2026' }, { key: '2026-12', label: 'Grudzień 2026' },
+      { key: '2027-01', label: 'Styczeń 2027' }, { key: '2027-02', label: 'Luty 2027' }, { key: '2027-03', label: 'Marzec 2027' },
+      { key: '2027-04', label: 'Kwiecień 2027' }, { key: '2027-05', label: 'Maj 2027' }, { key: '2027-06', label: 'Czerwiec 2027' },
+      { key: '2027-07', label: 'Lipiec 2027' }, { key: '2027-08', label: 'Sierpień 2027' }, { key: '2027-09', label: 'Wrzesień 2027' }
     ];
 
     let state = {
       currentMonthKey: '2026-09',
-      bills: [],
-      syncCode: localStorage.getItem(STORAGE_PREFIX + 'syncCode') || '',
-      lastSyncTime: 0
+      bills: JSON.parse(localStorage.getItem(STORAGE_PREFIX + 'bills')) || [],
+      categories: JSON.parse(localStorage.getItem(STORAGE_PREFIX + 'categories')) || ['Mieszkanie', 'Media', 'Kredyty', 'Jedzenie', 'Inne'],
+      supaUrl: localStorage.getItem(STORAGE_PREFIX + 'supaUrl') || '',
+      supaKey: localStorage.getItem(STORAGE_PREFIX + 'supaKey') || '',
+      supaSyncId: localStorage.getItem(STORAGE_PREFIX + 'supaSyncId') || 'MOJ-PLANNER-1'
     };
 
     let cloudInterval = null;
     let isSyncing = false;
 
-    // Przykładowe dane startowe
-    const INITIAL_BILLS = [
-      { id: 'b-1', monthKey: '2026-09', name: 'Czynsz', amount: 850.00, day: 10, category: 'Mieszkanie', status: 'PAID' },
-      { id: 'b-2', monthKey: '2026-09', name: 'Prąd', amount: 245.50, day: 15, category: 'Media', status: 'PENDING' },
-      { id: 'b-3', monthKey: '2026-09', name: 'Kredyt', amount: 2150.00, day: 20, category: 'Kredyty', status: 'PENDING' }
-    ];
+    // Funkcje podstawowe
+    function saveLocal() {
+      localStorage.setItem(STORAGE_PREFIX + 'bills', JSON.stringify(state.bills));
+      localStorage.setItem(STORAGE_PREFIX + 'categories', JSON.stringify(state.categories));
+      pushToSupabase();
+    }
 
-    // --- CHMURA (KVDB API - W pełni darmowe, bez logowania) ---
+    function initTheme() {
+      if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+      } else { document.documentElement.classList.remove('dark'); }
+    }
     
-    async function initCloud() {
-      // Wykrywanie kodu w URL z linku parującego (np. #sync=DOM-123)
-      if (window.location.hash.startsWith('#sync=')) {
-        const code = window.location.hash.replace('#sync=', '').trim();
-        state.syncCode = code;
-        localStorage.setItem(STORAGE_PREFIX + 'syncCode', code);
-        history.replaceState(null, '', window.location.pathname); // wyczyść pasek adresu
-        showToast('Pomyślnie powiązano konto z linku!', 'success');
-      }
+    function toggleTheme() {
+      const html = document.documentElement;
+      if (html.classList.contains('dark')) { html.classList.remove('dark'); localStorage.setItem('theme', 'light'); } 
+      else { html.classList.add('dark'); localStorage.setItem('theme', 'dark'); }
+    }
+    initTheme();
 
-      if (!state.syncCode) {
-        state.syncCode = 'DOM-' + Math.floor(1000 + Math.random() * 9000);
-        localStorage.setItem(STORAGE_PREFIX + 'syncCode', state.syncCode);
-      }
-      
-      const inEl = document.getElementById('inputSyncCode');
-      if (inEl) inEl.value = state.syncCode;
-
-      pullFromCloud();
-      cloudInterval = setInterval(pullFromCloud, 3000); // Szybkie pobieranie co 3 sekundy
+    function showToast(msg, type='success') {
+      const t = document.createElement('div');
+      t.className = `px-4 py-3 rounded-xl shadow-xl font-bold text-sm transform transition-all translate-y-full opacity-0 flex items-center gap-2 ${type === 'success' ? 'bg-emerald-600 text-white' : 'bg-red-500 text-white'}`;
+      t.innerHTML = msg;
+      document.getElementById('toastContainer').appendChild(t);
+      setTimeout(() => { t.classList.remove('translate-y-full', 'opacity-0'); }, 10);
+      setTimeout(() => { t.classList.add('translate-y-full', 'opacity-0'); setTimeout(() => t.remove(), 300); }, 3000);
     }
 
-    async function pullFromCloud() {
-      if (isSyncing || !state.syncCode) return;
+    async function pullFromSupabase() {
+      if (isSyncing || !state.supaUrl || !state.supaKey || !state.supaSyncId) return;
       try {
-        const res = await fetch(`https://kvdb.io/${state.syncCode}/state`);
+        const res = await fetch(`${state.supaUrl}/rest/v1/planner_data?sync_id=eq.${state.supaSyncId}&select=data`, {
+          headers: { 'apikey': state.supaKey, 'Authorization': `Bearer ${state.supaKey}` }
+        });
         if (res.ok) {
-          const data = await res.json();
-          if (data && data.timestamp && data.timestamp > state.lastSyncTime) {
-             state.bills = data.bills || [];
-             state.lastSyncTime = data.timestamp;
-             updateCloudUI(true);
-             refreshUI();
+          const rows = await res.json();
+          if (rows.length > 0 && rows[0].data) {
+            // Unikaj nieskończonej pętli odświeżania, sprawdzając, czy dane się różnią (uproszczone poprzez długość lub pełny string)
+            const remoteStr = JSON.stringify(rows[0].data.bills || []);
+            const localStr = JSON.stringify(state.bills);
+            if(remoteStr !== localStr) {
+               state.bills = rows[0].data.bills || [];
+               state.categories = rows[0].data.categories || state.categories;
+               localStorage.setItem(STORAGE_PREFIX + 'bills', JSON.stringify(state.bills));
+               localStorage.setItem(STORAGE_PREFIX + 'categories', JSON.stringify(state.categories));
+               refreshUI();
+            }
           }
-        }
-      } catch (e) {
-        updateCloudUI(false);
-      }
+          updateCloudStatus(true);
+        } else { updateCloudStatus(false); }
+      } catch (e) { updateCloudStatus(false); }
     }
 
-    async function pushToCloud() {
-      if (!state.syncCode) return;
+    async function pushToSupabase() {
+      if (!state.supaUrl || !state.supaKey || !state.supaSyncId) return;
       isSyncing = true;
       try {
-        state.lastSyncTime = Date.now();
-        const payload = { bills: state.bills, timestamp: state.lastSyncTime };
-        await fetch(`https://kvdb.io/${state.syncCode}/state`, {
+        const payload = { sync_id: state.supaSyncId, data: { bills: state.bills, categories: state.categories, timestamp: Date.now() } };
+        // Upsert w Supabase
+        await fetch(`${state.supaUrl}/rest/v1/planner_data`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'apikey': state.supaKey, 'Authorization': `Bearer ${state.supaKey}`, 'Content-Type': 'application/json', 'Prefer': 'resolution=merge-duplicates' },
           body: JSON.stringify(payload)
         });
-        updateCloudUI(true);
-      } catch (e) {
-        updateCloudUI(false);
-      }
+        updateCloudStatus(true);
+      } catch (e) { updateCloudStatus(false); }
       isSyncing = false;
     }
 
-    function updateCloudUI(isActive) {
-      const dot = document.getElementById('cloudStatusDot');
-      const txt = document.getElementById('cloudStatusText');
-      const stat = document.getElementById('syncModalStatus');
-      const mStat = document.getElementById('mobileCloudStatus');
+    function saveSupabaseConfig() {
+      state.supaSyncId = document.getElementById('supaSyncId').value.trim();
+      state.supaUrl = document.getElementById('supaUrl').value.trim();
+      state.supaKey = document.getElementById('supaKey').value.trim();
       
-      if (isActive) {
-        if(dot) dot.className = 'w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.8)]';
-        if(txt) txt.textContent = 'Aktywna';
-        if(stat) { stat.textContent = 'Połączono (Czas rzeczywisty)'; stat.className = 'text-xs text-center font-bold text-emerald-500 mt-2'; }
-        if(mStat) mStat.textContent = 'Chmura: Aktywna';
-      } else {
-        if(dot) dot.className = 'w-2 h-2 rounded-full bg-slate-400';
-        if(txt) txt.textContent = 'Offline';
-        if(stat) { stat.textContent = 'Brak połączenia'; stat.className = 'text-xs text-center font-bold text-slate-500 mt-2'; }
-        if(mStat) mStat.textContent = 'Chmura: Offline';
-      }
-    }
-
-    function applySyncCode() {
-      const inEl = document.getElementById('inputSyncCode');
-      const val = inEl.value.trim().toUpperCase();
-      if(val.length < 3) { showToast('Kod jest za krótki', 'error'); return; }
-      state.syncCode = val;
-      localStorage.setItem(STORAGE_PREFIX + 'syncCode', val);
-      state.lastSyncTime = 0; // Wymuszenie pobrania całej bazy
-      pullFromCloud();
-      showToast('Zapisano i powiązano z nowym kodem', 'success');
+      localStorage.setItem(STORAGE_PREFIX + 'supaSyncId', state.supaSyncId);
+      localStorage.setItem(STORAGE_PREFIX + 'supaUrl', state.supaUrl);
+      localStorage.setItem(STORAGE_PREFIX + 'supaKey', state.supaKey);
+      
+      showToast('Konfiguracja zapisana', 'success');
       closeModal('syncModal');
-    }
-
-    function copySyncLink() {
-      const link = window.location.origin + window.location.pathname + '#sync=' + state.syncCode;
-      const t = document.createElement('textarea');
-      t.value = link;
-      document.body.appendChild(t);
-      t.select();
-      document.execCommand('copy');
-      document.body.removeChild(t);
-      showToast('Skopiowano! Wklej na telefonie.', 'success');
-    }
-
-    // --- FUNKCJE UI I WYŚWIETLANIA ---
-
-    function switchTab(tabId) {
-      document.querySelectorAll('main > section').forEach(s => s.classList.add('hidden'));
-      document.querySelectorAll('nav button').forEach(b => {
-        b.classList.remove('border-emerald-600', 'text-emerald-700', 'dark:text-emerald-400');
-        b.classList.add('border-transparent', 'text-slate-500');
-      });
+      pushToSupabase();
       
-      const sec = document.getElementById('section-' + tabId);
-      if (sec) sec.classList.remove('hidden');
-      
-      const btn = document.getElementById('tab-' + tabId);
-      if (btn) {
-        btn.classList.remove('border-transparent', 'text-slate-500');
-        btn.classList.add('border-emerald-600', 'text-emerald-700', 'dark:text-emerald-400');
-      }
-
-      if (tabId === 'calendar') renderCalendar();
-      if (tabId === 'yearly') renderYearlySummary();
+      if(cloudInterval) clearInterval(cloudInterval);
+      if(state.supaUrl && state.supaKey) cloudInterval = setInterval(pullFromSupabase, 5000);
     }
 
-    function toggleMobileMenu() {
-      const mod = document.getElementById('mobileMenuModal');
-      const draw = document.getElementById('mobileDrawer');
-      if (mod.classList.contains('hidden')) {
-        mod.classList.remove('hidden');
-        setTimeout(() => { draw.classList.remove('-translate-x-full'); }, 10);
-      } else {
-        draw.classList.add('-translate-x-full');
-        setTimeout(() => { mod.classList.add('hidden'); }, 300);
-      }
+    function updateCloudStatus(isOk) {
+      const dot = document.getElementById('cloudStatusDot');
+      if (isOk) { dot.className = 'w-2 h-2 rounded-full bg-emerald-500 animate-pulse'; } 
+      else { dot.className = 'w-2 h-2 rounded-full bg-red-500'; }
     }
 
-    function buildMonthSelector() {
-      const sel = document.getElementById('monthSelector');
-      sel.innerHTML = '';
-      MONTHS.forEach((m, idx) => {
-        const opt = document.createElement('option');
-        opt.value = m.key;
-        opt.textContent = m.label;
-        sel.appendChild(opt);
-      });
-      sel.value = state.currentMonthKey;
+    function buildSelectors() {
+      const ms = document.getElementById('monthSelector');
+      ms.innerHTML = '';
+      MONTHS.forEach(m => { const opt = document.createElement('option'); opt.value = m.key; opt.textContent = m.label; ms.appendChild(opt); });
+      ms.value = state.currentMonthKey;
+
+      const cs = document.getElementById('addCategorySel');
+      if(cs) {
+         cs.innerHTML = '';
+         state.categories.forEach(c => { const opt = document.createElement('option'); opt.value = c; opt.textContent = c; cs.appendChild(opt); });
+      }
     }
 
     function switchMonth(key) {
@@ -611,216 +426,305 @@
 
     function changeMonth(delta) {
       const idx = MONTHS.findIndex(m => m.key === state.currentMonthKey);
-      let newIdx = idx + delta;
-      if (newIdx >= 0 && newIdx < MONTHS.length) {
-        switchMonth(MONTHS[newIdx].key);
-      }
+      if (idx + delta >= 0 && idx + delta < MONTHS.length) switchMonth(MONTHS[idx + delta].key);
     }
 
-    // --- GŁÓWNY SILNIK RENDEROWANIA ---
+    function switchTab(tabId) {
+      document.querySelectorAll('main > section').forEach(s => s.classList.add('hidden'));
+      document.querySelectorAll('nav button').forEach(b => {
+        b.classList.remove('border-emerald-600', 'text-emerald-700', 'dark:text-emerald-400');
+        b.classList.add('border-transparent', 'text-slate-500');
+      });
+      const sec = document.getElementById('section-' + tabId);
+      if (sec) sec.classList.remove('hidden');
+      const btn = document.getElementById('tab-' + tabId);
+      if (btn) btn.classList.remove('border-transparent', 'text-slate-500');
+      if (btn) btn.classList.add('border-emerald-600', 'text-emerald-700', 'dark:text-emerald-400');
+
+      if (tabId === 'calendar') renderCalendar();
+      if (tabId === 'yearly') renderYearlySummary();
+      if (tabId === 'customize') renderCategories();
+    }
+
+    function toggleMobileMenu() {
+      const mod = document.getElementById('mobileMenuModal');
+      const draw = document.getElementById('mobileDrawer');
+      if (mod.classList.contains('hidden')) { mod.classList.remove('hidden'); setTimeout(() => { draw.classList.remove('-translate-x-full'); }, 10); } 
+      else { draw.classList.add('-translate-x-full'); setTimeout(() => { mod.classList.add('hidden'); }, 300); }
+    }
+    
+    function openModal(id) {
+      if(id === 'syncModal') {
+         document.getElementById('supaSyncId').value = state.supaSyncId;
+         document.getElementById('supaUrl').value = state.supaUrl;
+         document.getElementById('supaKey').value = state.supaKey;
+      }
+      const m = document.getElementById(id); const i = m.querySelector('div[id$="Inner"]');
+      m.classList.remove('hidden'); setTimeout(() => { i.classList.remove('scale-95', 'opacity-0'); }, 10);
+    }
+    function closeModal(id) {
+      const m = document.getElementById(id); const i = m.querySelector('div[id$="Inner"]');
+      i.classList.add('scale-95', 'opacity-0'); setTimeout(() => { m.classList.add('hidden'); }, 200);
+    }
+    function openAddModal() { openModal('addModal'); }
 
     function refreshUI() {
-      const currentBills = state.bills.filter(b => b.monthKey === state.currentMonthKey);
-      
-      // Update KPIs
+      const curr = state.bills.filter(b => b.monthKey === state.currentMonthKey);
       let total = 0, paid = 0, pending = 0;
-      currentBills.forEach(b => {
-        total += b.amount;
-        if (b.status === 'PAID' || b.status === 'AUTOPAY') paid += b.amount;
-        else pending += b.amount;
-      });
+      curr.forEach(b => { total += b.amount; if (b.status === 'PAID') paid += b.amount; else pending += b.amount; });
 
       document.getElementById('kpiTotal').textContent = total.toFixed(2) + ' zł';
-      document.getElementById('kpiCount').textContent = `Liczba pozycji: ${currentBills.length}`;
+      document.getElementById('kpiCount').textContent = `Liczba: ${curr.length}`;
       document.getElementById('kpiPaid').textContent = paid.toFixed(2) + ' zł';
       document.getElementById('kpiPending').textContent = pending.toFixed(2) + ' zł';
-      
-      const prog = total > 0 ? (paid / total * 100) : 0;
-      document.getElementById('kpiProgress').style.width = `${prog}%`;
-      
-      const badge = document.getElementById('tabCountBadge');
-      if(badge) badge.textContent = currentBills.length;
+      document.getElementById('kpiProgress').style.width = total > 0 ? `${(paid/total)*100}%` : '0%';
+      const badge = document.getElementById('tabCountBadge'); if(badge) badge.textContent = curr.length;
 
-      // Najbliższe płatności na pulpicie
-      const pendingBills = currentBills.filter(b => b.status === 'PENDING').sort((a,b) => a.day - b.day);
-      if (pendingBills.length > 0) {
-        document.getElementById('kpiNextDue').textContent = `${pendingBills[0].day}. dzień: ${pendingBills[0].name}`;
-        document.getElementById('kpiNextDueSub').textContent = pendingBills[0].amount.toFixed(2) + ' zł';
+      const pendBills = curr.filter(b => b.status === 'PENDING').sort((a,b) => a.day - b.day);
+      if (pendBills.length > 0) {
+        document.getElementById('kpiNextDue').textContent = `${pendBills[0].day}. dzień: ${pendBills[0].name}`;
+        document.getElementById('kpiNextDueSub').textContent = pendBills[0].amount.toFixed(2) + ' zł';
       } else {
         document.getElementById('kpiNextDue').textContent = 'Wszystko opłacone';
-        document.getElementById('kpiNextDueSub').textContent = 'Brak oczekujących';
+        document.getElementById('kpiNextDueSub').textContent = 'Brak pilnych';
       }
 
-      renderTransactions();
+      renderDashboard(curr);
+      renderTransactions(curr);
     }
 
-    function renderTransactions() {
-      const currentBills = state.bills.filter(b => b.monthKey === state.currentMonthKey);
+    function renderDashboard(curr) {
+      const catTotals = {};
+      curr.forEach(b => { catTotals[b.category] = (catTotals[b.category] || 0) + b.amount; });
+      const total = Object.values(catTotals).reduce((a,b)=>a+b, 0);
+      const cc = document.getElementById('categoryChartContainer');
+      cc.innerHTML = '';
+      if(total === 0) cc.innerHTML = '<p class="text-slate-500 text-sm">Brak wydatków w tym miesiącu.</p>';
+      
+      Object.entries(catTotals).sort((a,b)=>b[1]-a[1]).forEach(([cat, sum]) => {
+        const pct = ((sum/total)*100).toFixed(0);
+        cc.innerHTML += `
+          <div>
+            <div class="flex justify-between text-xs font-bold mb-1"><span class="text-slate-700 dark:text-slate-300">${cat}</span><span class="text-slate-900 dark:text-white">${sum.toFixed(2)} zł (${pct}%)</span></div>
+            <div class="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2"><div class="bg-emerald-500 h-2 rounded-full" style="width: ${pct}%"></div></div>
+          </div>
+        `;
+      });
+
+      const ul = document.getElementById('upcomingList');
+      ul.innerHTML = '';
+      const pend = curr.filter(b => b.status === 'PENDING').sort((a,b) => a.day - b.day).slice(0, 5);
+      if(pend.length === 0) ul.innerHTML = '<p class="text-slate-500 text-sm">Brak nadchodzących płatności.</p>';
+      pend.forEach(b => {
+        ul.innerHTML += `
+          <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700/50">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-500 font-black flex items-center justify-center flex-col leading-none">
+                <span class="text-sm">${b.day}</span><span class="text-[8px] uppercase">Dzień</span>
+              </div>
+              <div><p class="font-bold text-sm text-slate-900 dark:text-white">${b.name}</p><p class="text-xs text-slate-500">${b.category}</p></div>
+            </div>
+            <div class="text-right">
+              <p class="font-black text-sm text-slate-900 dark:text-white">${b.amount.toFixed(2)} zł</p>
+              <button onclick="toggleBillStatus('${b.id}')" class="text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline">Opłać</button>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function renderTransactions(currentBills = null) {
+      if(!currentBills) currentBills = state.bills.filter(b => b.monthKey === state.currentMonthKey);
       const search = document.getElementById('searchInput') ? document.getElementById('searchInput').value.toLowerCase() : '';
       const filter = document.getElementById('statusFilter') ? document.getElementById('statusFilter').value : 'ALL';
       
       let filtered = currentBills.filter(b => {
-        const mSearch = b.name.toLowerCase().includes(search) || b.category.toLowerCase().includes(search);
-        const mFilter = filter === 'ALL' || b.status === filter;
-        return mSearch && mFilter;
+        return (b.name.toLowerCase().includes(search) || b.category.toLowerCase().includes(search)) && (filter === 'ALL' || b.status === filter);
       }).sort((a, b) => a.day - b.day);
 
-      const tableBody = document.getElementById('transactionsTableBody');
-      const cardsContainer = document.getElementById('transactionsCards');
-      
-      tableBody.innerHTML = '';
-      cardsContainer.innerHTML = '';
+      const tbody = document.getElementById('transactionsTableBody');
+      const cards = document.getElementById('transactionsCards');
+      tbody.innerHTML = ''; cards.innerHTML = '';
 
       if (filtered.length === 0) {
-        tableBody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-500">Brak rachunków w tym miesiącu. Dodaj pierwszy!</td></tr>`;
-        cardsContainer.innerHTML = `<div class="p-8 text-center text-slate-500 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">Brak rachunków. Dodaj przyciskiem na górze.</div>`;
+        tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-slate-500">Brak rachunków.</td></tr>`;
+        cards.innerHTML = `<div class="p-8 text-center text-slate-500 bg-white dark:bg-slate-900 rounded-xl border border-slate-200">Brak rachunków.</div>`;
         return;
       }
 
       filtered.forEach(b => {
-        const isPaid = (b.status === 'PAID' || b.status === 'AUTOPAY');
+        const isPaid = b.status === 'PAID';
         
-        // --- WIDOK KART (MOBILE) ---
-        // Idealne do klikania kciukiem
-        const card = document.createElement('div');
-        card.className = `p-4 rounded-2xl border transition-all shadow-sm flex items-center gap-4 ${isPaid ? 'bg-emerald-50/50 dark:bg-emerald-900/10 border-emerald-100 dark:border-emerald-900/30' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800'}`;
-        card.innerHTML = `
-          <button onclick="toggleBillStatus('${b.id}')" class="shrink-0 w-12 h-12 flex items-center justify-center rounded-xl transition ${isPaid ? 'bg-emerald-500 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-400'}">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-          </button>
-          <div class="flex-1 min-w-0">
-             <div class="flex justify-between items-baseline mb-0.5">
-                <h3 class="font-bold text-slate-900 dark:text-white truncate pr-2 ${isPaid ? 'line-through opacity-70' : ''}">${b.name}</h3>
-                <span class="font-black text-slate-900 dark:text-white whitespace-nowrap">${b.amount.toFixed(2)} zł</span>
-             </div>
-             <div class="flex items-center text-xs text-slate-500 dark:text-slate-400 gap-2">
-                <span class="font-bold flex items-center gap-1"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>${b.day} dnia</span>
-                <span class="truncate px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 rounded-md">${b.category}</span>
-             </div>
-          </div>
-          <button onclick="deleteBill('${b.id}')" class="p-2 text-slate-300 hover:text-red-500 transition shrink-0"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
-        `;
-        cardsContainer.appendChild(card);
-
-        // --- WIDOK TABELI (DESKTOP) ---
-        const tr = document.createElement('tr');
-        tr.className = `hover:bg-slate-50 dark:hover:bg-slate-800/80 transition-colors ${isPaid ? 'opacity-70' : ''}`;
-        tr.innerHTML = `
-          <td class="px-6 py-4">
-            <button onclick="toggleBillStatus('${b.id}')" class="flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold transition-colors ${isPaid ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400' : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400 hover:bg-slate-200'}">
-               <div class="w-2 h-2 rounded-full ${isPaid ? 'bg-emerald-500' : 'bg-slate-400'}"></div>
-               ${isPaid ? 'Opłacone' : 'Do zapłaty'}
+        // Karty Mobile
+        cards.innerHTML += `
+          <div class="p-4 rounded-2xl border transition-all shadow-sm flex items-center gap-4 ${isPaid ? 'bg-emerald-50/50 dark:bg-emerald-900/10 border-emerald-100 dark:border-emerald-900/30' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800'}">
+            <button onclick="toggleBillStatus('${b.id}')" class="shrink-0 w-12 h-12 flex items-center justify-center rounded-xl transition ${isPaid ? 'bg-emerald-500 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-400'}">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
             </button>
-          </td>
-          <td class="px-6 py-4 font-bold text-slate-700 dark:text-slate-300">${b.day}</td>
-          <td class="px-6 py-4">
-            <div class="font-bold text-slate-900 dark:text-white ${isPaid ? 'line-through' : ''}">${b.name}</div>
-            <div class="text-xs text-slate-500 mt-0.5">${b.category}</div>
-          </td>
-          <td class="px-6 py-4 text-right font-black text-slate-900 dark:text-white">${b.amount.toFixed(2)} zł</td>
-          <td class="px-6 py-4 text-xs text-slate-500">${b.account || '-'}</td>
-          <td class="px-6 py-4 text-right">
-             <button onclick="deleteBill('${b.id}')" class="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
-          </td>
+            <div class="flex-1 min-w-0">
+               <div class="flex justify-between items-baseline mb-0.5"><h3 class="font-bold text-slate-900 dark:text-white truncate pr-2 ${isPaid?'line-through opacity-70':''}">${b.name}</h3><span class="font-black text-slate-900 dark:text-white">${b.amount.toFixed(2)} zł</span></div>
+               <div class="flex items-center text-xs text-slate-500 gap-2"><span class="font-bold">${b.day} dnia</span><span class="px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 rounded-md">${b.category}</span></div>
+            </div>
+            <button onclick="deleteBill('${b.id}')" class="p-2 text-slate-300 hover:text-red-500 transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
+          </div>
         `;
-        tableBody.appendChild(tr);
+
+        // Tabela Desktop
+        tbody.innerHTML += `
+          <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/80 transition-colors ${isPaid?'opacity-70':''}">
+            <td class="px-6 py-4"><button onclick="toggleBillStatus('${b.id}')" class="flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold ${isPaid?'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40':'bg-slate-100 text-slate-600 dark:bg-slate-800'}"><div class="w-2 h-2 rounded-full ${isPaid?'bg-emerald-500':'bg-slate-400'}"></div>${isPaid?'Opłacone':'Do zapłaty'}</button></td>
+            <td class="px-6 py-4 font-bold text-slate-700 dark:text-slate-300">${b.day}</td>
+            <td class="px-6 py-4"><div class="font-bold text-slate-900 dark:text-white ${isPaid?'line-through':''}">${b.name}</div><div class="text-xs text-slate-500">${b.category}</div></td>
+            <td class="px-6 py-4 text-right font-black text-slate-900 dark:text-white">${b.amount.toFixed(2)} zł</td>
+            <td class="px-6 py-4 text-right"><button onclick="deleteBill('${b.id}')" class="p-2 text-slate-400 hover:text-red-500"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button></td>
+          </tr>
+        `;
       });
     }
 
-    // --- OPERACJE NA DANYCH ---
+    function renderCalendar() {
+      const grid = document.getElementById('calendarGrid');
+      grid.innerHTML = '';
+      
+      const mData = MONTHS.find(m => m.key === state.currentMonthKey);
+      document.getElementById('calendarMonthName').textContent = mData.label;
+      
+      const curr = state.bills.filter(b => b.monthKey === state.currentMonthKey);
+      
+      // Prosty kalendarz oparty na JS Date (do uzyskania pierwszego dnia miesiąca)
+      const [year, month] = state.currentMonthKey.split('-');
+      const firstDayDate = new Date(year, parseInt(month)-1, 1);
+      let startDay = firstDayDate.getDay(); // 0 to Niedziela
+      startDay = startDay === 0 ? 7 : startDay; // Przesunięcie dla PN = 1
+      const daysInMonth = new Date(year, parseInt(month), 0).getDate();
 
+      // Puste miejsca na początku
+      for(let i=1; i<startDay; i++) { grid.innerHTML += `<div class="p-2 sm:p-4 rounded-xl"></div>`; }
+      
+      for(let i=1; i<=daysInMonth; i++) {
+         const dayBills = curr.filter(b => b.day === i);
+         let dots = '';
+         dayBills.forEach(b => { dots += `<div class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full ${b.status==='PAID'?'bg-emerald-500':'bg-amber-500'}" title="${b.name}"></div>`; });
+         
+         const hasPending = dayBills.some(b => b.status === 'PENDING');
+         grid.innerHTML += `
+           <div class="p-2 sm:p-4 rounded-xl border flex flex-col items-center ${hasPending ? 'border-amber-200 bg-amber-50 dark:border-amber-900/50 dark:bg-amber-900/10' : 'border-slate-100 bg-white dark:border-slate-800 dark:bg-slate-900'}">
+             <span class="text-xs sm:text-sm font-bold ${hasPending ? 'text-amber-700 dark:text-amber-500' : 'text-slate-700 dark:text-slate-300'}">${i}</span>
+             <div class="flex flex-wrap justify-center gap-1 mt-1 sm:mt-2 h-4">${dots}</div>
+           </div>
+         `;
+      }
+    }
+
+    function renderYearlySummary() {
+      const tb = document.getElementById('yearlyTableBody');
+      tb.innerHTML = '';
+      
+      let gt = 0, gp = 0;
+
+      MONTHS.forEach(m => {
+        const mBills = state.bills.filter(b => b.monthKey === m.key);
+        let t = 0, p = 0;
+        mBills.forEach(b => { t += b.amount; if (b.status === 'PAID') p += b.amount; });
+        gt += t; gp += p;
+        
+        tb.innerHTML += `
+          <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/80 transition cursor-pointer" onclick="switchMonth('${m.key}'); switchTab('dashboard');">
+            <td class="p-3 font-bold text-slate-900 dark:text-white">${m.label}</td>
+            <td class="p-3 text-center text-slate-500">${mBills.length}</td>
+            <td class="p-3 text-right font-bold text-slate-700 dark:text-slate-300">${t.toFixed(2)} zł</td>
+            <td class="p-3 text-right font-bold text-emerald-600 dark:text-emerald-400">${p.toFixed(2)} zł</td>
+            <td class="p-3 text-right font-bold text-amber-600 dark:text-amber-500">${(t-p).toFixed(2)} zł</td>
+          </tr>
+        `;
+      });
+
+      tb.innerHTML += `
+        <tr class="bg-slate-100 dark:bg-slate-800 font-black text-slate-900 dark:text-white border-t-2 border-slate-300 dark:border-slate-600">
+          <td class="p-3">RAZEM (13 m-cy)</td>
+          <td class="p-3 text-center">-</td>
+          <td class="p-3 text-right">${gt.toFixed(2)} zł</td>
+          <td class="p-3 text-right text-emerald-600 dark:text-emerald-400">${gp.toFixed(2)} zł</td>
+          <td class="p-3 text-right text-amber-600 dark:text-amber-500">${(gt-gp).toFixed(2)} zł</td>
+        </tr>
+      `;
+    }
+
+    function renderCategories() {
+      const list = document.getElementById('categoriesList');
+      list.innerHTML = '';
+      state.categories.forEach(c => {
+         list.innerHTML += `<div class="flex items-center gap-2 px-3 py-1.5 bg-slate-100 dark:bg-slate-800 rounded-lg text-sm font-bold text-slate-700 dark:text-slate-300">${c} <button onclick="deleteCategory('${c}')" class="text-red-500 hover:text-red-700 ml-2">&times;</button></div>`;
+      });
+      buildSelectors();
+    }
+
+    // Akcje Modyfikujące
     function toggleBillStatus(id) {
       const b = state.bills.find(x => x.id === id);
-      if (b) {
-        b.status = b.status === 'PENDING' ? 'PAID' : 'PENDING';
-        pushToCloud();
-        refreshUI();
-      }
+      if (b) { b.status = b.status === 'PENDING' ? 'PAID' : 'PENDING'; saveLocal(); refreshUI(); }
     }
 
     function deleteBill(id) {
       state.bills = state.bills.filter(x => x.id !== id);
-      pushToCloud();
-      refreshUI();
-      showToast('Usunięto rachunek', 'success');
+      saveLocal(); refreshUI(); showToast('Usunięto rachunek', 'success');
+    }
+
+    function saveNewBill() {
+      const name = document.getElementById('addName').value.trim();
+      const amount = parseFloat(document.getElementById('addAmount').value);
+      const day = parseInt(document.getElementById('addDay').value);
+      const cat = document.getElementById('addCategorySel').value;
+
+      if(!name || isNaN(amount) || isNaN(day) || day < 1 || day > 31) { showToast('Uzupełnij poprawnie pola', 'error'); return; }
+
+      state.bills.push({
+        id: 'b-' + Math.random().toString(36).substr(2, 9),
+        monthKey: state.currentMonthKey,
+        name: name, amount: amount, day: day, category: cat, status: 'PENDING'
+      });
+      
+      saveLocal(); refreshUI(); closeModal('addModal'); showToast('Dodano rachunek', 'success');
+      document.getElementById('addName').value = '';
+    }
+
+    function addCategory() {
+      const c = document.getElementById('newCategoryInput').value.trim();
+      if(c && !state.categories.includes(c)) { state.categories.push(c); document.getElementById('newCategoryInput').value = ''; saveLocal(); renderCategories(); }
+    }
+    
+    function deleteCategory(c) {
+      state.categories = state.categories.filter(x => x !== c); saveLocal(); renderCategories();
     }
 
     function copyToNextMonth() {
       const idx = MONTHS.findIndex(m => m.key === state.currentMonthKey);
-      if (idx === -1 || idx === MONTHS.length - 1) { showToast('To ostatni miesiąc w cyklu.', 'error'); return; }
+      if (idx === -1 || idx === MONTHS.length - 1) { showToast('To ostatni miesiąc', 'error'); return; }
       
       const nextKey = MONTHS[idx + 1].key;
-      const currentBills = state.bills.filter(b => b.monthKey === state.currentMonthKey);
+      const curr = state.bills.filter(b => b.monthKey === state.currentMonthKey);
+      if (curr.length === 0) { showToast('Brak rachunków', 'error'); return; }
       
-      if (currentBills.length === 0) { showToast('Brak rachunków do skopiowania', 'error'); return; }
-      
-      let copiedCount = 0;
-      currentBills.forEach(b => {
-        // Zabezpieczenie przed dublowaniem
-        const exists = state.bills.find(xb => xb.monthKey === nextKey && xb.name === b.name);
-        if (!exists) {
-          state.bills.push({
-            id: 'b-' + Math.random().toString(36).substr(2, 9),
-            monthKey: nextKey,
-            name: b.name,
-            amount: b.amount,
-            day: b.day,
-            category: b.category,
-            account: b.account,
-            status: b.status === 'AUTOPAY' ? 'AUTOPAY' : 'PENDING' // Kopiuj autopay, reszta czeka na opłacenie
-          });
-          copiedCount++;
+      let copied = 0;
+      curr.forEach(b => {
+        if (!state.bills.find(xb => xb.monthKey === nextKey && xb.name === b.name)) {
+          state.bills.push({ ...b, id: 'b-' + Math.random().toString(36).substr(2,9), monthKey: nextKey, status: 'PENDING' });
+          copied++;
         }
       });
       
-      if(copiedCount > 0) {
-        pushToCloud();
-        showToast(`Skopiowano ${copiedCount} pozycji. Przełączam...`, 'success');
-        setTimeout(() => switchMonth(nextKey), 1000);
-      } else {
-         showToast('Wszystkie rachunki już istnieją w kolejnym miesiącu', 'warning');
-      }
+      if(copied > 0) { saveLocal(); showToast(`Skopiowano ${copied} poz.`, 'success'); switchMonth(nextKey); }
+      else showToast('Wszystko już istnieje w kol. m-cu', 'error');
     }
 
-    // --- MODALE, TOASTY, INICJALIZACJA ---
-
-    function openModal(id) { 
-      const m = document.getElementById(id); 
-      const i = m.querySelector('div[id$="Inner"]');
-      m.classList.remove('hidden'); 
-      setTimeout(() => { i.classList.remove('scale-95', 'opacity-0'); }, 10);
-    }
-    
-    function closeModal(id) { 
-      const m = document.getElementById(id);
-      const i = m.querySelector('div[id$="Inner"]');
-      i.classList.add('scale-95', 'opacity-0');
-      setTimeout(() => { m.classList.add('hidden'); }, 200);
-    }
-    
-    function openAddModal() { alert('Dla zwięzłości kodu formularz nowej płatności usunięto w tym bloku, możesz go dodać standardowo jak w HTML'); }
-
-    function showToast(msg, type='success') {
-      const t = document.createElement('div');
-      t.className = `px-4 py-3 rounded-xl shadow-xl font-bold text-sm transform transition-all translate-y-full opacity-0 flex items-center gap-2 ${type === 'success' ? 'bg-emerald-600 text-white' : 'bg-red-500 text-white'}`;
-      t.innerHTML = msg;
-      document.getElementById('toastContainer').appendChild(t);
-      setTimeout(() => { t.classList.remove('translate-y-full', 'opacity-0'); }, 10);
-      setTimeout(() => { 
-         t.classList.add('translate-y-full', 'opacity-0');
-         setTimeout(() => t.remove(), 300);
-      }, 3000);
-    }
-
-    // START
+    // Inicjalizacja Startowa
     window.onload = () => {
-      // Jeśli brak danych, wstaw przykładowe
-      if (!localStorage.getItem(STORAGE_PREFIX + 'syncCode')) {
-        state.bills = [...INITIAL_BILLS];
-      }
-      buildMonthSelector();
+      buildSelectors();
       switchTab('dashboard');
-      initCloud(); // Uruchomienie Firebase/KVDB
+      if (state.supaUrl && state.supaKey) {
+        pullFromSupabase();
+        cloudInterval = setInterval(pullFromSupabase, 5000);
+      }
     };
   </script>
 </body>
