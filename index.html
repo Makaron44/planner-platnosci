@@ -41,8 +41,6 @@
 
   <header class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-40 safe-padding-top shadow-sm">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      
-      <!-- Wiersz 1: Logo, Hamburger i Przyciski akcji -->
       <div class="flex items-center justify-between h-16 gap-3">
         <div class="flex items-center gap-3">
           <button onclick="toggleMobileMenu()" class="p-2 -ml-2 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white rounded-lg">
@@ -62,7 +60,8 @@
         <!-- Akcje w nagłówku -->
         <div class="flex items-center gap-2">
           <button onclick="toggleTheme()" class="p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 dark:text-slate-400 rounded-full transition" title="Tryb jasny/ciemny">
-            <svg id="themeIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+            <svg class="w-5 h-5 dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+            <svg class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
           </button>
           
           <button onclick="openModal('syncModal')" class="flex items-center gap-1.5 px-2.5 py-1.5 sm:px-3 sm:py-2 text-[10px] sm:text-xs font-bold text-emerald-800 bg-emerald-100 dark:bg-emerald-900/50 dark:text-emerald-300 rounded-lg hover:bg-emerald-200 transition border border-emerald-200 dark:border-emerald-800 shrink-0">
@@ -77,10 +76,10 @@
         </div>
       </div>
 
-      <!-- Wiersz 2: Zakładki i Wybór Miesiąca -->
+      <!-- Zakładki i Wybór Miesiąca -->
       <div class="flex flex-col sm:flex-row sm:items-center justify-between py-2 border-t border-slate-100 dark:border-slate-800 gap-3">
         
-        <!-- Zakładki - Pulpit, Płatności, Kalendarz, Roczne, Cykliczne, Kategorie -->
+        <!-- Zakładki na desktopy -->
         <div class="hidden sm:flex overflow-x-auto no-scrollbar flex-1">
           <nav class="flex space-x-6 min-w-max px-1" aria-label="Tabs">
             <button id="tab-dashboard" onclick="switchTab('dashboard')" class="border-emerald-600 text-emerald-700 dark:text-emerald-400 whitespace-nowrap py-2 border-b-2 font-bold text-sm transition flex items-center gap-2">Pulpit</button>
@@ -93,7 +92,7 @@
         </div>
 
         <!-- Przełącznik miesięcy -->
-        <div class="flex items-center justify-center sm:justify-end gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl border border-slate-200 dark:border-slate-700 w-full sm:w-auto">
+        <div class="flex items-center justify-between sm:justify-end gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl border border-slate-200 dark:border-slate-700 w-full sm:w-auto">
           <button onclick="changeMonth(-1)" class="p-2 hover:bg-white dark:hover:bg-slate-700 rounded-lg transition text-slate-600 dark:text-slate-300"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg></button>
           <select id="monthSelector" onchange="switchMonth(this.value)" class="flex-1 sm:flex-none bg-transparent border-none text-sm font-bold text-slate-800 dark:text-slate-100 focus:ring-0 cursor-pointer appearance-none px-4 text-center"></select>
           <button onclick="changeMonth(1)" class="p-2 hover:bg-white dark:hover:bg-slate-700 rounded-lg transition text-slate-600 dark:text-slate-300"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></button>
@@ -206,13 +205,13 @@
       </div>
     </section>
 
-    <!-- SEKCJA: PŁATNOŚCI CYKLICZNE (MASTER LISTA) -->
+    <!-- SEKCJA: PŁATNOŚCI CYKLICZNE -->
     <section id="section-recurring" class="hidden space-y-4">
       <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <div>
             <h2 class="text-lg font-bold text-slate-900 dark:text-white">Płatności Cykliczne (Roczne i Półroczne)</h2>
-            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Twoja główna lista ubezpieczeń, podatków i opłat długoterminowych. Miej wszystko pod kontrolą w jednym miejscu.</p>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Twoja master-lista zobowiązań rocznych i półrocznych. Trzymaj je tutaj z notatkami, by mieć wszystko pod kontrolą.</p>
           </div>
           <button onclick="openAddRecurringModal()" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-md transition flex items-center gap-2 shrink-0">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
@@ -223,7 +222,7 @@
         <div class="overflow-x-auto no-scrollbar">
           <table class="w-full text-left text-sm text-slate-600 dark:text-slate-300">
             <thead class="bg-slate-50 dark:bg-slate-800/80 text-slate-500 text-xs uppercase tracking-wider font-bold border-b border-slate-200 dark:border-slate-800">
-              <tr><th class="p-4">Nazwa zobowiązania</th><th class="p-4">Częstość</th><th class="p-4">Kategoria</th><th class="p-4 text-right">Szacowana Kwota</th><th class="p-4 text-right">Akcje</th></tr>
+              <tr><th class="p-4">Nazwa zobowiązania</th><th class="p-4">Częstość</th><th class="p-4">Kategoria</th><th class="p-4">Notatka / Termin</th><th class="p-4 text-right">Szacowana Kwota</th><th class="p-4 text-right">Akcje</th></tr>
             </thead>
             <tbody id="recurringTableBody" class="divide-y divide-slate-100 dark:divide-slate-800/50"></tbody>
           </table>
@@ -316,6 +315,10 @@
             <option value="SEMIANNUALLY">Co pół roku</option>
             <option value="ANNUALLY">Raz w roku</option>
           </select>
+        </div>
+        <div>
+          <label class="block text-xs font-bold mb-1.5 dark:text-slate-300 uppercase tracking-wide">Notatka / Przybliżona data</label>
+          <input type="text" id="addNote" class="w-full px-4 py-3 border border-slate-300 rounded-xl dark:bg-slate-950 dark:border-slate-700 dark:text-white focus:ring-2 focus:ring-emerald-500 outline-none shadow-sm text-sm" placeholder="np. Płatne w maju / PZU">
         </div>
         <button id="saveBtn" onclick="saveNewBill()" class="w-full px-4 py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-xl shadow-lg shadow-emerald-500/30 transition text-lg">Zapisz Rachunek</button>
       </div>
@@ -529,23 +532,27 @@
     
     function openAddModal() { 
       editingBillId = null;
+      editingRecurringId = null;
       document.getElementById('modalTitle').textContent = 'Nowy Rachunek';
       document.getElementById('saveBtn').textContent = 'Zapisz Rachunek';
       document.getElementById('addName').value = '';
       document.getElementById('addAmount').value = '';
       document.getElementById('addDay').value = '';
       document.getElementById('addFrequency').value = 'MONTHLY';
+      document.getElementById('addNote').value = '';
       openModal('addModal'); 
     }
 
     function openAddRecurringModal() {
       editingRecurringId = null;
+      editingBillId = null;
       document.getElementById('modalTitle').textContent = 'Nowa Płatność Cykliczna';
       document.getElementById('saveBtn').textContent = 'Zapisz w Cyklicznych';
       document.getElementById('addName').value = '';
       document.getElementById('addAmount').value = '';
       document.getElementById('addDay').value = '';
       document.getElementById('addFrequency').value = 'ANNUALLY';
+      document.getElementById('addNote').value = '';
       openModal('addModal');
     }
 
@@ -561,6 +568,7 @@
       document.getElementById('addDay').value = b.day;
       document.getElementById('addCategorySel').value = b.category;
       document.getElementById('addFrequency').value = b.frequency || 'MONTHLY';
+      document.getElementById('addNote').value = b.note || '';
       openModal('addModal');
     }
 
@@ -576,6 +584,7 @@
       document.getElementById('addDay').value = r.day;
       document.getElementById('addCategorySel').value = r.category;
       document.getElementById('addFrequency').value = r.frequency || 'ANNUALLY';
+      document.getElementById('addNote').value = r.note || '';
       openModal('addModal');
     }
 
@@ -688,6 +697,7 @@
             <div class="flex-1 min-w-0 py-1">
                <div class="flex justify-between items-baseline mb-1"><h3 class="font-bold text-slate-900 dark:text-white truncate pr-2 ${isPaid?'line-through opacity-60':''}">${b.name}</h3><span class="font-black text-slate-900 dark:text-white">${formatAmount(b.amount)}</span></div>
                <div class="flex items-center text-[11px] text-slate-500 gap-2 flex-wrap"><span class="font-bold bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-md">${b.day} dnia</span><span class="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 rounded-md truncate">${b.category}</span>${freqLabel}</div>
+               ${b.note ? `<div class="text-[11px] text-slate-400 dark:text-slate-500 mt-1 italic">📝 ${b.note}</div>` : ''}
             </div>
             <div class="flex flex-col gap-1 shrink-0">
                <button onclick="editBill('${b.id}')" class="p-2 text-slate-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl transition" title="Edytuj"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button>
@@ -700,7 +710,7 @@
           <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/80 transition-colors ${isPaid?'opacity-60':''}">
             <td class="px-6 py-4"><button onclick="toggleBillStatus('${b.id}')" class="flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-bold transition shadow-sm ${isPaid?'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40':'bg-slate-100 text-slate-600 dark:bg-slate-800 hover:bg-emerald-50 dark:hover:bg-emerald-900/20'}"><div class="w-2.5 h-2.5 rounded-full ${isPaid?'bg-emerald-500 shadow-sm shadow-emerald-500/50':'bg-slate-400'}"></div>${isPaid?'Opłacone':'Do zapłaty'}</button></td>
             <td class="px-6 py-4 font-black text-slate-700 dark:text-slate-300">${b.day}</td>
-            <td class="px-6 py-4"><div class="font-bold text-slate-900 dark:text-white text-base ${isPaid?'line-through':''}">${b.name}</div><div class="text-xs text-slate-500 mt-0.5 flex items-center">${b.category}${freqLabel}</div></td>
+            <td class="px-6 py-4"><div class="font-bold text-slate-900 dark:text-white text-base ${isPaid?'line-through':''}">${b.name}</div><div class="text-xs text-slate-500 mt-0.5 flex items-center">${b.category}${freqLabel}</div>${b.note ? `<div class="text-xs text-slate-400 dark:text-slate-500 mt-1 italic">📝 ${b.note}</div>` : ''}</td>
             <td class="px-6 py-4 text-right font-black text-slate-900 dark:text-white text-base">${formatAmount(b.amount)}</td>
             <td class="px-6 py-4 text-right flex items-center justify-end gap-1">
               <button onclick="editBill('${b.id}')" class="p-2 text-slate-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl transition" title="Edytuj"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button>
@@ -753,7 +763,7 @@
          dayBills.forEach(b => { 
            let dotClass = 'bg-red-500'; 
            if (b.status === 'PAID') dotClass = 'bg-emerald-500';
-           else if (isOverdue) dotClass = 'bg-red-500 animate-pulse ring-2 ring-red-500/50';
+           else if (isOverdue) dotClass = 'bg-red-500 animate-pulse';
 
            dots += `<div class="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full ${dotClass} shadow-sm" title="${b.name}"></div>`; 
          });
@@ -762,7 +772,9 @@
          if (isToday) {
              tileBg = 'border-indigo-500 dark:border-indigo-500 bg-indigo-50/20 dark:bg-indigo-950/20 shadow-md ring-1 ring-indigo-500/50 z-10';
          } else if (isOverdue) {
-             tileBg = 'border-red-500/60 bg-red-50/20 dark:border-red-500/60 dark:bg-red-950/20 ring-1 ring-red-500/40';
+             tileBg = 'border-red-500 dark:border-red-500 bg-red-50/10 dark:bg-red-950/20 ring-1 ring-red-500/50';
+         } else if (hasPending) {
+             tileBg = 'border-red-500/40 dark:border-red-500/40 bg-white dark:bg-slate-900';
          }
 
          let textStyle = 'text-slate-700 dark:text-slate-300';
@@ -820,7 +832,7 @@
       const tb = document.getElementById('recurringTableBody');
       tb.innerHTML = '';
       if (!state.recurringBills || state.recurringBills.length === 0) {
-        tb.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-slate-500 font-medium">Brak zdefiniowanych płatności cyklicznych. Kliknij przycisk powyżej, aby dodać np. OC/AC, ubezpieczenie domu czy podatki.</td></tr>`;
+        tb.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-500 font-medium">Brak zdefiniowanych płatności cyklicznych. Kliknij przycisk powyżej, aby dodać np. OC/AC, ubezpieczenie domu czy podatki.</td></tr>`;
         return;
       }
 
@@ -833,6 +845,7 @@
             <td class="p-4 font-bold text-slate-900 dark:text-white">${r.name}</td>
             <td class="p-4">${freqBadge}</td>
             <td class="p-4"><span class="bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-lg text-xs font-semibold">${r.category}</span></td>
+            <td class="p-4 text-xs text-slate-500 dark:text-slate-400">${r.note ? '📝 ' + r.note : '-'}</td>
             <td class="p-4 text-right font-black text-slate-900 dark:text-white">${formatAmount(r.amount)} <span class="block text-[10px] text-slate-400 font-normal">${r.day} dzień m-ca</span></td>
             <td class="p-4 text-right flex items-center justify-end gap-1">
               <button onclick="editRecurring('${r.id}')" class="p-2 text-slate-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl transition" title="Edytuj"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button>
@@ -874,29 +887,29 @@
       const day = parseInt(document.getElementById('addDay').value);
       const cat = document.getElementById('addCategorySel').value;
       const freq = document.getElementById('addFrequency').value;
+      const note = document.getElementById('addNote').value.trim();
 
       if(!name || isNaN(day) || day < 1 || day > 31) { 
         showToast('Podaj Nazwę i Dzień m-ca (Kwota może być pusta)', 'error'); 
         return; 
       }
 
-      // Jeśli dodajemy z zakładki Płatności Cykliczne
       const isFromRecurringTab = !document.getElementById('section-recurring').classList.contains('hidden');
 
       if (editingBillId) {
         const b = state.bills.find(x => x.id === editingBillId);
-        if (b) { b.name = name; b.amount = amount; b.day = day; b.category = cat; b.frequency = freq; }
+        if (b) { b.name = name; b.amount = amount; b.day = day; b.category = cat; b.frequency = freq; b.note = note; }
         showToast('Zapisano zmiany!', 'success');
         editingBillId = null;
       } else if (editingRecurringId) {
         const r = state.recurringBills.find(x => x.id === editingRecurringId);
-        if (r) { r.name = name; r.amount = amount; r.day = day; r.category = cat; r.frequency = freq; }
+        if (r) { r.name = name; r.amount = amount; r.day = day; r.category = cat; r.frequency = freq; r.note = note; }
         showToast('Zapisano zmiany w cyklicznych!', 'success');
         editingRecurringId = null;
       } else if (isFromRecurringTab) {
         const newRec = {
           id: 'rec-' + Math.random().toString(36).substr(2, 9),
-          name: name, amount: amount, day: day, category: cat, frequency: freq
+          name: name, amount: amount, day: day, category: cat, frequency: freq, note: note
         };
         state.recurringBills.push(newRec);
         showToast('Dodano do płatności cyklicznych!', 'success');
@@ -904,7 +917,7 @@
         const newBill = {
           id: 'b-' + Math.random().toString(36).substr(2, 9),
           monthKey: state.currentMonthKey,
-          name: name, amount: amount, day: day, category: cat, status: 'PENDING', frequency: freq
+          name: name, amount: amount, day: day, category: cat, status: 'PENDING', frequency: freq, note: note
         };
         state.bills.push(newBill);
 
@@ -926,6 +939,7 @@
       document.getElementById('addName').value = '';
       document.getElementById('addAmount').value = '';
       document.getElementById('addDay').value = '';
+      document.getElementById('addNote').value = '';
     }
 
     function addCategory() {
