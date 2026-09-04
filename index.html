@@ -8,8 +8,12 @@
   <meta name="theme-color" content="#059669">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <link rel="apple-touch-icon" href="https://placehold.co/192x192/059669/white?text=P">
-  <link rel="manifest" href='data:application/manifest+json,{"name":"Planner Płatności","short_name":"Planner","start_url":".","display":"standalone","background_color":"#ffffff","theme_color":"#059669","icons":[{"src":"https://placehold.co/192x192/059669/white?text=P","sizes":"192x192","type":"image/png"}]}'>
+  <meta name="apple-mobile-web-app-title" content="Planner Płatności">
+  
+  <!-- Nowa wektorowa ikona aplikacji dla iPhone'a (zamiast czarnego kwadratu) -->
+  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='120' fill='%23059669'/%3E%3Cpath fill='%23ffffff' d='M128 136c0-22.1 17.9-40 40-40h24V72c0-13.3 10.7-24 24-24s24 10.7 24 24v24h72V72c0-13.3 10.7-24 24-24s24 10.7 24 24v24h24c22.1 0 40 17.9 40 40v56H128v-56zm0 104h256v136c0 22.1-17.9 40-40 40H168c-22.1 0-40-17.9-40-40V240zm128 88c22.1 0 40-17.9 40-40s-17.9-40-40-40-40 17.9-40 40 17.9 40 40 40z'/%3E%3C/svg%3E">
+  <!-- Manifest PWA -->
+  <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22Planner%20P%C5%82atno%C5%9Bci%22%2C%22short_name%22%3A%22Planner%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23ffffff%22%2C%22theme_color%22%3A%22%23059669%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%253Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%20512%20512%27%253E%253Crect%20width%3D%27512%27%20height%3D%27512%27%20rx%3D%27120%27%20fill%3D%27%2523059669%27%2F%253E%253Cpath%20fill%3D%27%2523ffffff%27%20d%3D%27M128%20136c0-22.1%2017.9-40%2040-40h24V72c0-13.3%2010.7-24%2024-24s24%2010.7%2024%2024v24h72V72c0-13.3%2010.7-24%2024-24s24%2010.7%2024%2024v24h24c22.1%200%2040%2017.9%2040%2040v56H128v-56zm0%20104h256v136c0%2022.1-17.9%2040-40%2040H168c-22.1%200-40-17.9-40-40V240zm128%2088c22.1%200%2040-17.9%2040-40s-17.9-40-40-40-40%2017.9-40%2040%2017.9%2040%2040%2040z%27%2F%253E%253C%2Fsvg%253E%22%2C%22sizes%22%3A%22192x192%20512x512%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D">
   
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -35,8 +39,8 @@
     .safe-padding-top { padding-top: env(safe-area-inset-top); }
     .safe-padding-bottom { padding-bottom: env(safe-area-inset-bottom); }
 
-    /* Wymuszony brak pływania na boki na telefonie */
-    html, body { overflow-x: hidden; width: 100%; position: relative; }
+    /* Całkowite zablokowanie "pływania" na boki */
+    html, body { overflow-x: hidden; width: 100%; position: relative; max-width: 100vw; }
   </style>
 </head>
 <body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 min-h-screen flex flex-col safe-padding-bottom">
@@ -45,40 +49,47 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       
       <!-- Wiersz 1: Logo i Akcje -->
-      <div class="flex items-center justify-between h-16 gap-4">
+      <div class="flex items-center justify-between h-16 gap-3">
+        <!-- Lewa strona: Hamburger i Logo -->
         <div class="flex items-center gap-3">
           <button onclick="toggleMobileMenu()" class="sm:hidden p-2 -ml-2 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white rounded-lg">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
           </button>
+          
           <div class="w-10 h-10 shrink-0 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 flex items-center justify-center text-white shadow-md shadow-emerald-500/20">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
           </div>
-          <div class="hidden sm:block">
-            <h1 class="text-lg font-bold tracking-tight text-slate-900 dark:text-white leading-none">Planner Płatności</h1>
-            <p class="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold mt-0.5">2026-2027</p>
+          
+          <div>
+            <h1 class="text-base sm:text-lg font-bold tracking-tight text-slate-900 dark:text-white leading-none">Planner Płatności</h1>
+            <p class="text-[10px] sm:text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold mt-0.5">2026-2027</p>
           </div>
         </div>
 
-        <div class="flex items-center gap-2">
+        <!-- Prawa strona: Przyciski akcji -->
+        <div class="flex items-center gap-2 sm:gap-3">
           <button onclick="toggleTheme()" class="p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 dark:text-slate-400 rounded-full transition" title="Tryb jasny/ciemny">
             <svg id="themeIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
           </button>
-          <button onclick="openModal('syncModal')" class="flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-emerald-800 bg-emerald-100 dark:bg-emerald-900/50 dark:text-emerald-300 rounded-lg hover:bg-emerald-200 transition border border-emerald-200 dark:border-emerald-800">
+          
+          <button onclick="openModal('syncModal')" class="flex items-center gap-1.5 sm:gap-2 px-2.5 py-1.5 sm:px-3 sm:py-2 text-[10px] sm:text-xs font-bold text-emerald-800 bg-emerald-100 dark:bg-emerald-900/50 dark:text-emerald-300 rounded-lg hover:bg-emerald-200 transition border border-emerald-200 dark:border-emerald-800 shrink-0">
             <div id="cloudStatusDot" class="w-2 h-2 rounded-full bg-slate-400"></div>
-            <span id="cloudStatusText">Chmura Supabase</span>
+            <span id="cloudStatusText" class="hidden sm:inline">Chmura Supabase</span>
+            <span class="sm:hidden">Chmura</span>
           </button>
-          <button onclick="openAddModal()" class="flex items-center justify-center bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg shadow-md transition px-3 py-1.5 sm:px-4 sm:py-2">
+          
+          <button onclick="openAddModal()" class="flex items-center justify-center bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg shadow-md transition px-3 py-1.5 sm:px-4 sm:py-2 shrink-0">
             <svg class="w-5 h-5 sm:mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
             <span class="hidden sm:inline text-sm">Dodaj</span>
           </button>
         </div>
       </div>
 
-      <!-- Wiersz 2: Nawigacja i Miesiąc (Zoptymalizowane pod Mobile) -->
-      <div class="flex items-center justify-between py-2 border-t border-slate-100 dark:border-slate-800 gap-4">
+      <!-- Wiersz 2: Zakładki (Desktop) i Wybór Miesiąca -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between py-2 border-t border-slate-100 dark:border-slate-800 gap-3">
         
-        <!-- Pasek Zakładek (Przewijany na mobile) -->
-        <div class="flex-1 overflow-x-auto no-scrollbar">
+        <!-- Zakładki - Widoczne tylko na Desktopie -->
+        <div class="hidden sm:flex overflow-x-auto no-scrollbar flex-1">
           <nav class="flex space-x-6 min-w-max px-1" aria-label="Tabs">
             <button id="tab-dashboard" onclick="switchTab('dashboard')" class="border-emerald-600 text-emerald-700 dark:text-emerald-400 whitespace-nowrap py-2 border-b-2 font-bold text-sm transition flex items-center gap-2">Pulpit</button>
             <button id="tab-transactions" onclick="switchTab('transactions')" class="border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-300 whitespace-nowrap py-2 border-b-2 font-semibold text-sm transition flex items-center gap-2">Płatności <span id="tabCountBadge" class="ml-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 py-0.5 px-2 rounded-full text-xs">0</span></button>
@@ -88,13 +99,13 @@
           </nav>
         </div>
 
-        <!-- Przełącznik miesięcy -->
-        <div class="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-lg border border-slate-200 dark:border-slate-700 shrink-0">
-          <button onclick="changeMonth(-1)" class="p-1 hover:bg-white dark:hover:bg-slate-700 rounded-md transition text-slate-600 dark:text-slate-300"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg></button>
-          <select id="monthSelector" onchange="switchMonth(this.value)" class="bg-transparent border-none text-sm font-bold text-slate-800 dark:text-slate-100 focus:ring-0 cursor-pointer appearance-none px-2 text-center">
+        <!-- Przełącznik miesięcy - Na telefonie zajmuje całą szerokość i jest wycentrowany -->
+        <div class="flex items-center justify-center sm:justify-end gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl border border-slate-200 dark:border-slate-700 w-full sm:w-auto">
+          <button onclick="changeMonth(-1)" class="p-2 hover:bg-white dark:hover:bg-slate-700 rounded-lg transition text-slate-600 dark:text-slate-300"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg></button>
+          <select id="monthSelector" onchange="switchMonth(this.value)" class="flex-1 sm:flex-none bg-transparent border-none text-sm font-bold text-slate-800 dark:text-slate-100 focus:ring-0 cursor-pointer appearance-none px-4 text-center text-center-last">
             <!-- Opcje generowane w JS -->
           </select>
-          <button onclick="changeMonth(1)" class="p-1 hover:bg-white dark:hover:bg-slate-700 rounded-md transition text-slate-600 dark:text-slate-300"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></button>
+          <button onclick="changeMonth(1)" class="p-2 hover:bg-white dark:hover:bg-slate-700 rounded-lg transition text-slate-600 dark:text-slate-300"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></button>
         </div>
       </div>
     </div>
@@ -102,24 +113,24 @@
 
   <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
 
-    <!-- KPI Cards -->
+    <!-- KPI Cards (Karty informacyjne) -->
     <div id="kpi-container" class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-      <div class="bg-white dark:bg-slate-900 rounded-xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden">
-        <div class="text-slate-500 dark:text-slate-400 mb-1 flex items-center justify-between"><span class="text-[10px] sm:text-xs font-semibold uppercase tracking-wider">Razem do zapłaty</span></div>
-        <div class="text-lg sm:text-2xl font-black text-slate-900 dark:text-white" id="kpiTotal">0,00 zł</div>
+      <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden">
+        <div class="text-slate-500 dark:text-slate-400 mb-1 flex items-center justify-between"><span class="text-[10px] sm:text-xs font-bold uppercase tracking-wider">Razem do zapłaty</span></div>
+        <div class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white" id="kpiTotal">0,00 zł</div>
         <p class="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 mt-1" id="kpiCount">Liczba pozycji: 0</p>
       </div>
-      <div class="bg-white dark:bg-slate-900 rounded-xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden">
-        <div class="text-slate-500 dark:text-slate-400 mb-1 flex items-center justify-between"><span class="text-[10px] sm:text-xs font-semibold uppercase tracking-wider">Już Opłacone</span></div>
-        <div class="text-lg sm:text-2xl font-black text-emerald-600 dark:text-emerald-400" id="kpiPaid">0,00 zł</div>
-        <div class="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-1.5 mt-2"><div class="bg-emerald-500 h-1.5 rounded-full" id="kpiProgress" style="width: 0%"></div></div>
+      <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden">
+        <div class="text-slate-500 dark:text-slate-400 mb-1 flex items-center justify-between"><span class="text-[10px] sm:text-xs font-bold uppercase tracking-wider">Już Opłacone</span></div>
+        <div class="text-xl sm:text-2xl font-black text-emerald-600 dark:text-emerald-400" id="kpiPaid">0,00 zł</div>
+        <div class="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-1.5 mt-2"><div class="bg-emerald-500 h-1.5 rounded-full transition-all duration-500" id="kpiProgress" style="width: 0%"></div></div>
       </div>
-      <div class="bg-white dark:bg-slate-900 rounded-xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden">
-        <div class="text-slate-500 dark:text-slate-400 mb-1 flex items-center justify-between"><span class="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-amber-600 dark:text-amber-500">Pozostało</span></div>
-        <div class="text-lg sm:text-2xl font-black text-amber-600 dark:text-amber-500" id="kpiPending">0,00 zł</div>
+      <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden">
+        <div class="text-slate-500 dark:text-slate-400 mb-1 flex items-center justify-between"><span class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-500">Pozostało</span></div>
+        <div class="text-xl sm:text-2xl font-black text-amber-600 dark:text-amber-500" id="kpiPending">0,00 zł</div>
       </div>
-      <div class="bg-white dark:bg-slate-900 rounded-xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden">
-        <div class="text-slate-500 dark:text-slate-400 mb-1 flex items-center justify-between"><span class="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">Najbliższe</span></div>
+      <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden">
+        <div class="text-slate-500 dark:text-slate-400 mb-1 flex items-center justify-between"><span class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">Najbliższe</span></div>
         <div class="text-sm sm:text-base font-bold text-slate-800 dark:text-slate-200 truncate" id="kpiNextDue">Brak pilnych</div>
         <p class="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 mt-1 truncate" id="kpiNextDueSub">Wszystko pod kontrolą</p>
       </div>
@@ -128,16 +139,21 @@
     <!-- SEKCJA: PULPIT -->
     <section id="section-dashboard" class="space-y-6 block">
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-6 border border-slate-200 dark:border-slate-800 shadow-sm lg:col-span-2">
+        <div class="bg-white dark:bg-slate-900 rounded-3xl p-5 sm:p-6 border border-slate-200 dark:border-slate-800 shadow-sm lg:col-span-2">
           <div class="flex items-center justify-between mb-6">
-            <h2 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white">Wydatki wg kategorii</h2>
+            <h2 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <div class="w-2 h-2 rounded-full bg-emerald-500"></div> Wydatki wg kategorii
+            </h2>
           </div>
           <div id="categoryChartContainer" class="space-y-4 max-h-[400px] overflow-y-auto pr-2 no-scrollbar">
             <!-- Paski kategorii generowane w JS -->
           </div>
         </div>
-        <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-6 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col">
-          <h2 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white mb-6">Nadchodzące terminy</h2>
+        <div class="bg-white dark:bg-slate-900 rounded-3xl p-5 sm:p-6 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col">
+          <h2 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
+            <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            Nadchodzące terminy
+          </h2>
           <div id="upcomingList" class="flex-1 space-y-3 overflow-y-auto no-scrollbar">
             <!-- Lista rachunków generowana w JS -->
           </div>
@@ -150,25 +166,25 @@
       <div class="flex flex-col sm:flex-row gap-3 justify-between">
         <div class="relative flex-1 max-w-md">
           <svg class="w-5 h-5 absolute left-3 top-2.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-          <input type="text" id="searchInput" placeholder="Szukaj rachunku..." oninput="renderTransactions()" class="w-full pl-10 pr-4 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 dark:text-white outline-none transition">
+          <input type="text" id="searchInput" placeholder="Szukaj rachunku..." oninput="renderTransactions()" class="w-full pl-10 pr-4 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 dark:text-white outline-none transition shadow-sm">
         </div>
         <div class="flex gap-2 w-full sm:w-auto">
-          <select id="statusFilter" onchange="renderTransactions()" class="flex-1 sm:flex-none py-2 px-3 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-sm font-medium dark:text-white outline-none">
+          <select id="statusFilter" onchange="renderTransactions()" class="flex-1 sm:flex-none py-2 px-3 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-sm font-bold text-slate-700 dark:text-slate-200 outline-none shadow-sm">
             <option value="ALL">Wszystkie</option><option value="PENDING">Do zapłaty</option><option value="PAID">Opłacone</option>
           </select>
-          <button onclick="copyToNextMonth()" class="flex-1 sm:flex-none px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-xl text-sm font-bold transition whitespace-nowrap border border-slate-200 dark:border-slate-700">
+          <button onclick="copyToNextMonth()" class="flex-1 sm:flex-none px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-xl text-sm font-bold transition whitespace-nowrap border border-slate-200 dark:border-slate-700 shadow-sm">
             Kopiuj na kolejny m-c
           </button>
         </div>
       </div>
 
-      <!-- KARTY (MOBILE) -->
+      <!-- KARTY (WIDOK MOBILE) -->
       <div id="transactionsCards" class="grid grid-cols-1 gap-3 sm:hidden"></div>
 
-      <!-- TABELA (DESKTOP) -->
+      <!-- TABELA (WIDOK DESKTOP) -->
       <div class="hidden sm:block bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm overflow-hidden">
         <table class="w-full text-left text-sm text-slate-600 dark:text-slate-300">
-          <thead class="bg-slate-50 dark:bg-slate-800/50 text-slate-500 text-xs uppercase tracking-wider font-semibold border-b border-slate-200 dark:border-slate-800">
+          <thead class="bg-slate-50 dark:bg-slate-800/80 text-slate-500 text-xs uppercase tracking-wider font-bold border-b border-slate-200 dark:border-slate-800">
             <tr><th class="px-6 py-4">Status</th><th class="px-6 py-4">Dzień</th><th class="px-6 py-4">Nazwa & Kategoria</th><th class="px-6 py-4 text-right">Kwota</th><th class="px-6 py-4 text-right">Akcje</th></tr>
           </thead>
           <tbody id="transactionsTableBody" class="divide-y divide-slate-100 dark:divide-slate-800/50"></tbody>
@@ -176,14 +192,14 @@
       </div>
     </section>
 
-    <!-- SEKCJA: KALENDARZ -->
+    <!-- SEKCJA: KALENDARZ (ZE ZAAWANSOWANYM PODŚWIETLENIEM) -->
     <section id="section-calendar" class="hidden">
-      <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-6 border border-slate-200 dark:border-slate-800 shadow-sm">
+      <div class="bg-white dark:bg-slate-900 rounded-3xl p-4 sm:p-6 border border-slate-200 dark:border-slate-800 shadow-sm">
         <div class="flex justify-between items-center mb-6">
           <h2 class="text-lg font-bold text-slate-900 dark:text-white">Kalendarz Płatności</h2>
-          <div class="text-sm font-medium text-emerald-600 dark:text-emerald-400" id="calendarMonthName"></div>
+          <div class="text-sm font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 px-3 py-1 rounded-lg" id="calendarMonthName"></div>
         </div>
-        <div class="grid grid-cols-7 gap-1 sm:gap-2 mb-2 text-center text-xs font-bold text-slate-400 uppercase">
+        <div class="grid grid-cols-7 gap-1 sm:gap-2 mb-2 text-center text-xs font-bold text-slate-400 uppercase tracking-wider">
           <div>Pn</div><div>Wt</div><div>Śr</div><div>Cz</div><div>Pt</div><div>Sb</div><div>Nd</div>
         </div>
         <div id="calendarGrid" class="grid grid-cols-7 gap-1 sm:gap-2 auto-rows-fr">
@@ -194,110 +210,115 @@
 
     <!-- SEKCJA: ROCZNE ZESTAWIENIE -->
     <section id="section-yearly" class="hidden">
-      <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200 dark:border-slate-800 shadow-sm overflow-x-auto">
-        <div class="flex justify-between items-center mb-4 min-w-[600px]">
+      <div class="bg-white dark:bg-slate-900 rounded-3xl p-4 border border-slate-200 dark:border-slate-800 shadow-sm overflow-x-auto no-scrollbar">
+        <div class="flex justify-between items-center mb-4 min-w-[600px] px-2">
           <h2 class="text-lg font-bold text-slate-900 dark:text-white">Zestawienie Roczne (2026-2027)</h2>
         </div>
         <table class="w-full text-left text-sm whitespace-nowrap min-w-[600px]">
-          <thead class="bg-slate-50 dark:bg-slate-800 text-slate-500 font-bold uppercase text-[10px] border-b border-slate-200 dark:border-slate-700">
-            <tr><th class="p-3">Miesiąc</th><th class="p-3 text-center">Rachunki</th><th class="p-3 text-right">Razem Kwota</th><th class="p-3 text-right">Opłacone</th><th class="p-3 text-right">Do zapłaty</th></tr>
+          <thead class="bg-slate-50 dark:bg-slate-800/80 text-slate-500 font-bold uppercase text-[10px] tracking-wider border-b border-slate-200 dark:border-slate-700">
+            <tr><th class="p-4 rounded-tl-xl">Miesiąc</th><th class="p-4 text-center">Rachunki</th><th class="p-4 text-right">Razem Kwota</th><th class="p-4 text-right">Opłacone</th><th class="p-4 text-right rounded-tr-xl">Do zapłaty</th></tr>
           </thead>
-          <tbody id="yearlyTableBody" class="divide-y divide-slate-100 dark:divide-slate-800"></tbody>
+          <tbody id="yearlyTableBody" class="divide-y divide-slate-100 dark:divide-slate-800/50"></tbody>
         </table>
       </div>
     </section>
 
     <!-- SEKCJA: KATEGORIE -->
     <section id="section-customize" class="hidden">
-      <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm">
-        <h2 class="text-lg font-bold text-slate-900 dark:text-white mb-4">Zarządzanie kategoriami</h2>
-        <div class="flex gap-2 mb-6 max-w-md">
-          <input type="text" id="newCategoryInput" placeholder="Nowa kategoria..." class="flex-1 px-4 py-2 border rounded-xl dark:bg-slate-800 dark:border-slate-700 dark:text-white">
-          <button onclick="addCategory()" class="px-4 py-2 bg-emerald-600 text-white font-bold rounded-xl">Dodaj</button>
+      <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm">
+        <h2 class="text-lg font-bold text-slate-900 dark:text-white mb-6">Zarządzanie kategoriami</h2>
+        <div class="flex flex-col sm:flex-row gap-3 mb-6 max-w-lg">
+          <input type="text" id="newCategoryInput" placeholder="Nowa kategoria (np. Paliwo)..." class="flex-1 px-4 py-3 border border-slate-300 rounded-xl dark:bg-slate-800 dark:border-slate-700 dark:text-white focus:ring-2 focus:ring-emerald-500 outline-none shadow-sm">
+          <button onclick="addCategory()" class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-md transition">Dodaj</button>
         </div>
         <div id="categoriesList" class="flex flex-wrap gap-2"></div>
       </div>
     </section>
   </main>
 
-  <!-- MODAL: Menu Mobilne Hamburger -->
-  <div id="mobileMenuModal" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm hidden flex transition-opacity duration-300">
-    <div class="bg-white dark:bg-slate-900 w-72 h-full shadow-2xl border-r border-slate-200 dark:border-slate-800 flex flex-col transform transition-transform duration-300 -translate-x-full" id="mobileDrawer">
+  <!-- MODAL: Menu Mobilne (Hamburger) -->
+  <div id="mobileMenuModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden transition-opacity duration-300">
+    <div class="bg-white dark:bg-slate-900 w-[280px] h-full shadow-2xl border-r border-slate-200 dark:border-slate-800 flex flex-col transform transition-transform duration-300 -translate-x-full" id="mobileDrawer">
       <div class="p-5 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50">
          <span class="block font-black text-slate-900 dark:text-white text-lg">Menu</span>
          <button onclick="toggleMobileMenu()" class="text-slate-500 p-2 rounded-lg bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-slate-700"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
       </div>
-      <nav class="p-4 space-y-2 flex-1">
-         <button onclick="switchTab('dashboard'); toggleMobileMenu();" class="w-full text-left px-4 py-3 rounded-xl font-bold text-slate-700 dark:text-slate-300 hover:bg-emerald-50 dark:hover:bg-slate-800">Pulpit</button>
-         <button onclick="switchTab('transactions'); toggleMobileMenu();" class="w-full text-left px-4 py-3 rounded-xl font-bold text-slate-700 dark:text-slate-300 hover:bg-emerald-50 dark:hover:bg-slate-800">Lista Płatności</button>
-         <button onclick="switchTab('calendar'); toggleMobileMenu();" class="w-full text-left px-4 py-3 rounded-xl font-bold text-slate-700 dark:text-slate-300 hover:bg-emerald-50 dark:hover:bg-slate-800">Kalendarz</button>
-         <button onclick="switchTab('yearly'); toggleMobileMenu();" class="w-full text-left px-4 py-3 rounded-xl font-bold text-slate-700 dark:text-slate-300 hover:bg-emerald-50 dark:hover:bg-slate-800">Roczne Zestawienie</button>
-         <button onclick="switchTab('customize'); toggleMobileMenu();" class="w-full text-left px-4 py-3 rounded-xl font-bold text-slate-700 dark:text-slate-300 hover:bg-emerald-50 dark:hover:bg-slate-800">Kategorie</button>
+      <nav class="p-4 space-y-2 flex-1 overflow-y-auto">
+         <button onclick="switchTab('dashboard'); toggleMobileMenu();" class="w-full text-left px-4 py-3 rounded-xl font-bold text-slate-700 dark:text-slate-300 hover:bg-emerald-50 dark:hover:bg-slate-800 flex items-center gap-3"><svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg> Pulpit</button>
+         <button onclick="switchTab('transactions'); toggleMobileMenu();" class="w-full text-left px-4 py-3 rounded-xl font-bold text-slate-700 dark:text-slate-300 hover:bg-emerald-50 dark:hover:bg-slate-800 flex items-center gap-3"><svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg> Lista Płatności</button>
+         <button onclick="switchTab('calendar'); toggleMobileMenu();" class="w-full text-left px-4 py-3 rounded-xl font-bold text-slate-700 dark:text-slate-300 hover:bg-emerald-50 dark:hover:bg-slate-800 flex items-center gap-3"><svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg> Kalendarz</button>
+         <button onclick="switchTab('yearly'); toggleMobileMenu();" class="w-full text-left px-4 py-3 rounded-xl font-bold text-slate-700 dark:text-slate-300 hover:bg-emerald-50 dark:hover:bg-slate-800 flex items-center gap-3"><svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg> Roczne Zestawienie</button>
+         <button onclick="switchTab('customize'); toggleMobileMenu();" class="w-full text-left px-4 py-3 rounded-xl font-bold text-slate-700 dark:text-slate-300 hover:bg-emerald-50 dark:hover:bg-slate-800 flex items-center gap-3"><svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg> Kategorie</button>
       </nav>
     </div>
   </div>
 
   <!-- MODAL: Chmura Supabase -->
-  <div id="syncModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
-    <div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-md shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden transform transition-all scale-95 opacity-0" id="syncModalInner">
+  <div id="syncModal" class="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="bg-white dark:bg-slate-900 rounded-3xl w-full max-w-md shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden transform transition-all scale-95 opacity-0" id="syncModalInner">
       <div class="p-5 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50">
-        <h3 class="text-lg font-black text-slate-900 dark:text-white">Chmura Supabase</h3>
-        <button onclick="closeModal('syncModal')" class="text-slate-400 p-1.5 rounded-lg border bg-white dark:bg-slate-800"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+        <h3 class="text-lg font-black text-slate-900 dark:text-white flex items-center gap-2">
+          <svg class="w-6 h-6 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"/></svg> 
+          Chmura Supabase
+        </h3>
+        <button onclick="closeModal('syncModal')" class="text-slate-400 p-2 rounded-xl bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-slate-700 hover:text-slate-600 transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
       </div>
       <div class="p-6 space-y-4">
-        <p class="text-xs text-slate-500 dark:text-slate-400">Podaj dane do swojego projektu Supabase. Wymagana jest tabela <code class="bg-slate-100 dark:bg-slate-800 px-1 rounded">planner_data</code> z kolumnami: <code class="bg-slate-100 dark:bg-slate-800 px-1 rounded">sync_id</code> (text) oraz <code class="bg-slate-100 dark:bg-slate-800 px-1 rounded">data</code> (jsonb).</p>
+        <p class="text-xs text-slate-500 dark:text-slate-400">Podaj dane do swojego projektu Supabase. Wymagana jest tabela <code class="bg-slate-100 dark:bg-slate-800 px-1 rounded text-emerald-600 dark:text-emerald-400">planner_data</code> z kolumnami: <code class="bg-slate-100 dark:bg-slate-800 px-1 rounded">sync_id</code> (Primary Key) oraz <code class="bg-slate-100 dark:bg-slate-800 px-1 rounded">data</code> (jsonb).</p>
         
         <div>
-          <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Twój unikalny kod synchronizacji (Sync ID):</label>
-          <input type="text" id="supaSyncId" class="w-full px-3 py-2 border rounded-lg bg-slate-50 dark:bg-slate-950 dark:border-slate-700 dark:text-white uppercase font-bold" placeholder="NP: MOJ-PLANNER-1">
+          <label class="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1.5 uppercase tracking-wide">Twój Kod Synchronizacji (Sync ID):</label>
+          <input type="text" id="supaSyncId" class="w-full px-4 py-3 border border-slate-300 rounded-xl bg-slate-50 dark:bg-slate-950 dark:border-slate-700 dark:text-white uppercase font-black text-center tracking-widest focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="NP: MOJ-PLANNER-1">
         </div>
         <div>
-          <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Supabase URL:</label>
-          <input type="text" id="supaUrl" class="w-full px-3 py-2 border rounded-lg bg-slate-50 dark:bg-slate-950 dark:border-slate-700 dark:text-white text-sm" placeholder="https://xyz.supabase.co">
+          <label class="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1.5 uppercase tracking-wide">Supabase URL:</label>
+          <input type="text" id="supaUrl" class="w-full px-4 py-3 border border-slate-300 rounded-xl bg-slate-50 dark:bg-slate-950 dark:border-slate-700 dark:text-white text-sm focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="https://xyz.supabase.co">
         </div>
         <div>
-          <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Supabase Anon Key:</label>
-          <input type="password" id="supaKey" class="w-full px-3 py-2 border rounded-lg bg-slate-50 dark:bg-slate-950 dark:border-slate-700 dark:text-white text-sm" placeholder="eyJhbGciOiJIUzI1NiIsInR5c...">
+          <label class="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1.5 uppercase tracking-wide">Supabase Anon Key:</label>
+          <input type="password" id="supaKey" class="w-full px-4 py-3 border border-slate-300 rounded-xl bg-slate-50 dark:bg-slate-950 dark:border-slate-700 dark:text-white text-sm focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="eyJhbGciOiJIUzI1NiIsInR5c...">
         </div>
-        <p id="syncModalStatus" class="text-xs font-bold text-center text-slate-500">Oczekuje na zapis...</p>
-        <button onclick="saveSupabaseConfig()" class="w-full px-4 py-3 bg-emerald-600 text-white font-bold rounded-xl shadow-md">Zapisz i Połącz</button>
+        <p id="syncModalStatus" class="text-xs font-bold text-center text-slate-500 pt-2"></p>
+        <button onclick="saveSupabaseConfig()" class="w-full px-4 py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-xl shadow-lg shadow-emerald-500/30 transition">Zapisz i Połącz z chmurą</button>
       </div>
     </div>
   </div>
 
   <!-- MODAL: Dodawanie Rachunku -->
-  <div id="addModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
-    <div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-sm shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden transform transition-all scale-95 opacity-0" id="addModalInner">
+  <div id="addModal" class="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-sm flex items-end sm:items-center justify-center sm:p-4 hidden transition-opacity duration-300">
+    <div class="bg-white dark:bg-slate-900 rounded-t-3xl sm:rounded-3xl w-full max-w-sm shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden transform transition-all translate-y-full sm:translate-y-0 sm:scale-95 opacity-0" id="addModalInner">
       <div class="p-5 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50">
         <h3 class="text-lg font-black text-slate-900 dark:text-white">Nowy Rachunek</h3>
-        <button onclick="closeModal('addModal')" class="text-slate-400 p-1.5 rounded-lg border bg-white dark:bg-slate-800"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+        <button onclick="closeModal('addModal')" class="text-slate-400 p-2 rounded-xl bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-slate-700 hover:text-slate-600 transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
       </div>
-      <div class="p-5 space-y-4">
-        <div><label class="block text-xs font-bold mb-1 dark:text-slate-300">Nazwa</label><input type="text" id="addName" class="w-full px-3 py-2 border rounded-lg dark:bg-slate-900 dark:border-slate-700 dark:text-white"></div>
-        <div class="grid grid-cols-2 gap-3">
-          <div><label class="block text-xs font-bold mb-1 dark:text-slate-300">Kwota (zł)</label><input type="number" id="addAmount" step="0.01" class="w-full px-3 py-2 border rounded-lg dark:bg-slate-900 dark:border-slate-700 dark:text-white"></div>
-          <div><label class="block text-xs font-bold mb-1 dark:text-slate-300">Dzień m-ca</label><input type="number" min="1" max="31" id="addDay" class="w-full px-3 py-2 border rounded-lg dark:bg-slate-900 dark:border-slate-700 dark:text-white"></div>
+      <div class="p-6 space-y-5">
+        <div><label class="block text-xs font-bold mb-1.5 dark:text-slate-300 uppercase tracking-wide">Nazwa (Kto / Za co)</label><input type="text" id="addName" class="w-full px-4 py-3 border border-slate-300 rounded-xl dark:bg-slate-950 dark:border-slate-700 dark:text-white focus:ring-2 focus:ring-emerald-500 outline-none shadow-sm"></div>
+        <div class="grid grid-cols-2 gap-4">
+          <div><label class="block text-xs font-bold mb-1.5 dark:text-slate-300 uppercase tracking-wide">Kwota (zł)</label><input type="number" id="addAmount" step="0.01" class="w-full px-4 py-3 border border-slate-300 rounded-xl dark:bg-slate-950 dark:border-slate-700 dark:text-white focus:ring-2 focus:ring-emerald-500 outline-none shadow-sm"></div>
+          <div><label class="block text-xs font-bold mb-1.5 dark:text-slate-300 uppercase tracking-wide">Dzień m-ca</label><input type="number" min="1" max="31" id="addDay" class="w-full px-4 py-3 border border-slate-300 rounded-xl dark:bg-slate-950 dark:border-slate-700 dark:text-white focus:ring-2 focus:ring-emerald-500 outline-none shadow-sm"></div>
         </div>
         <div>
-          <label class="block text-xs font-bold mb-1 dark:text-slate-300">Kategoria</label>
-          <select id="addCategorySel" class="w-full px-3 py-2 border rounded-lg dark:bg-slate-900 dark:border-slate-700 dark:text-white"></select>
+          <label class="block text-xs font-bold mb-1.5 dark:text-slate-300 uppercase tracking-wide">Kategoria</label>
+          <select id="addCategorySel" class="w-full px-4 py-3 border border-slate-300 rounded-xl dark:bg-slate-950 dark:border-slate-700 dark:text-white font-semibold focus:ring-2 focus:ring-emerald-500 outline-none shadow-sm"></select>
         </div>
-        <button onclick="saveNewBill()" class="w-full px-4 py-3 bg-emerald-600 text-white font-bold rounded-xl">Zapisz</button>
+        <button onclick="saveNewBill()" class="w-full px-4 py-4 mt-2 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-xl shadow-lg shadow-emerald-500/30 transition text-lg">Zapisz Rachunek</button>
       </div>
     </div>
   </div>
 
-  <div id="toastContainer" class="fixed bottom-5 left-1/2 transform -translate-x-1/2 z-50 flex flex-col gap-2"></div>
+  <div id="toastContainer" class="fixed bottom-5 left-1/2 transform -translate-x-1/2 z-50 flex flex-col gap-2 w-full max-w-sm px-4"></div>
 
   <script>
     // Konfiguracja i Stan
     const STORAGE_PREFIX = 'moje_platnosci_2026_';
     const MONTHS = [
-      { key: '2026-09', label: 'Wrzesień 2026', days: 30, startDay: 2 }, // Wtorek=2 (Dla uproszczenia kalendarza używamy JS Date)
-      { key: '2026-10', label: 'Październik 2026' }, { key: '2026-11', label: 'Listopad 2026' }, { key: '2026-12', label: 'Grudzień 2026' },
-      { key: '2027-01', label: 'Styczeń 2027' }, { key: '2027-02', label: 'Luty 2027' }, { key: '2027-03', label: 'Marzec 2027' },
-      { key: '2027-04', label: 'Kwiecień 2027' }, { key: '2027-05', label: 'Maj 2027' }, { key: '2027-06', label: 'Czerwiec 2027' },
-      { key: '2027-07', label: 'Lipiec 2027' }, { key: '2027-08', label: 'Sierpień 2027' }, { key: '2027-09', label: 'Wrzesień 2027' }
+      { key: '2026-09', label: 'Wrzesień 2026' }, { key: '2026-10', label: 'Październik 2026' }, 
+      { key: '2026-11', label: 'Listopad 2026' }, { key: '2026-12', label: 'Grudzień 2026' },
+      { key: '2027-01', label: 'Styczeń 2027' }, { key: '2027-02', label: 'Luty 2027' }, 
+      { key: '2027-03', label: 'Marzec 2027' }, { key: '2027-04', label: 'Kwiecień 2027' }, 
+      { key: '2027-05', label: 'Maj 2027' }, { key: '2027-06', label: 'Czerwiec 2027' },
+      { key: '2027-07', label: 'Lipiec 2027' }, { key: '2027-08', label: 'Sierpień 2027' }, 
+      { key: '2027-09', label: 'Wrzesień 2027' }
     ];
 
     let state = {
@@ -319,12 +340,12 @@
       pushToSupabase();
     }
 
+    // Tryb Ciemny
     function initTheme() {
       if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
         document.documentElement.classList.add('dark');
       } else { document.documentElement.classList.remove('dark'); }
     }
-    
     function toggleTheme() {
       const html = document.documentElement;
       if (html.classList.contains('dark')) { html.classList.remove('dark'); localStorage.setItem('theme', 'light'); } 
@@ -332,15 +353,17 @@
     }
     initTheme();
 
+    // Toasty (Powiadomienia)
     function showToast(msg, type='success') {
       const t = document.createElement('div');
-      t.className = `px-4 py-3 rounded-xl shadow-xl font-bold text-sm transform transition-all translate-y-full opacity-0 flex items-center gap-2 ${type === 'success' ? 'bg-emerald-600 text-white' : 'bg-red-500 text-white'}`;
+      t.className = `px-4 py-3.5 rounded-xl shadow-2xl font-bold text-sm transform transition-all translate-y-full opacity-0 flex items-center gap-3 w-full justify-center ${type === 'success' ? 'bg-emerald-600 text-white' : 'bg-red-500 text-white'}`;
       t.innerHTML = msg;
       document.getElementById('toastContainer').appendChild(t);
       setTimeout(() => { t.classList.remove('translate-y-full', 'opacity-0'); }, 10);
       setTimeout(() => { t.classList.add('translate-y-full', 'opacity-0'); setTimeout(() => t.remove(), 300); }, 3000);
     }
 
+    // Supabase Sync Logika
     async function pullFromSupabase() {
       if (isSyncing || !state.supaUrl || !state.supaKey || !state.supaSyncId) return;
       try {
@@ -350,7 +373,6 @@
         if (res.ok) {
           const rows = await res.json();
           if (rows.length > 0 && rows[0].data) {
-            // Unikaj nieskończonej pętli odświeżania, sprawdzając, czy dane się różnią (uproszczone poprzez długość lub pełny string)
             const remoteStr = JSON.stringify(rows[0].data.bills || []);
             const localStr = JSON.stringify(state.bills);
             if(remoteStr !== localStr) {
@@ -371,7 +393,6 @@
       isSyncing = true;
       try {
         const payload = { sync_id: state.supaSyncId, data: { bills: state.bills, categories: state.categories, timestamp: Date.now() } };
-        // Upsert w Supabase
         await fetch(`${state.supaUrl}/rest/v1/planner_data`, {
           method: 'POST',
           headers: { 'apikey': state.supaKey, 'Authorization': `Bearer ${state.supaKey}`, 'Content-Type': 'application/json', 'Prefer': 'resolution=merge-duplicates' },
@@ -396,7 +417,7 @@
       pushToSupabase();
       
       if(cloudInterval) clearInterval(cloudInterval);
-      if(state.supaUrl && state.supaKey) cloudInterval = setInterval(pullFromSupabase, 5000);
+      if(state.supaUrl && state.supaKey) cloudInterval = setInterval(pullFromSupabase, 4000); // Częstsze odświeżanie
     }
 
     function updateCloudStatus(isOk) {
@@ -405,6 +426,7 @@
       else { dot.className = 'w-2 h-2 rounded-full bg-red-500'; }
     }
 
+    // UI & Nawigacja
     function buildSelectors() {
       const ms = document.getElementById('monthSelector');
       ms.innerHTML = '';
@@ -449,8 +471,14 @@
     function toggleMobileMenu() {
       const mod = document.getElementById('mobileMenuModal');
       const draw = document.getElementById('mobileDrawer');
-      if (mod.classList.contains('hidden')) { mod.classList.remove('hidden'); setTimeout(() => { draw.classList.remove('-translate-x-full'); }, 10); } 
-      else { draw.classList.add('-translate-x-full'); setTimeout(() => { mod.classList.add('hidden'); }, 300); }
+      if (mod.classList.contains('hidden')) { 
+        mod.classList.remove('hidden'); 
+        setTimeout(() => { draw.classList.remove('-translate-x-full'); mod.classList.add('opacity-100'); }, 10); 
+      } else { 
+        draw.classList.add('-translate-x-full'); 
+        mod.classList.remove('opacity-100');
+        setTimeout(() => { mod.classList.add('hidden'); }, 300); 
+      }
     }
     
     function openModal(id) {
@@ -460,14 +488,27 @@
          document.getElementById('supaKey').value = state.supaKey;
       }
       const m = document.getElementById(id); const i = m.querySelector('div[id$="Inner"]');
-      m.classList.remove('hidden'); setTimeout(() => { i.classList.remove('scale-95', 'opacity-0'); }, 10);
+      m.classList.remove('hidden'); 
+      setTimeout(() => { 
+        if(window.innerWidth < 640 && id === 'addModal') {
+           i.classList.remove('translate-y-full', 'opacity-0'); 
+        } else {
+           i.classList.remove('scale-95', 'opacity-0'); 
+        }
+      }, 10);
     }
     function closeModal(id) {
       const m = document.getElementById(id); const i = m.querySelector('div[id$="Inner"]');
-      i.classList.add('scale-95', 'opacity-0'); setTimeout(() => { m.classList.add('hidden'); }, 200);
+      if(window.innerWidth < 640 && id === 'addModal') {
+         i.classList.add('translate-y-full', 'opacity-0');
+      } else {
+         i.classList.add('scale-95', 'opacity-0');
+      }
+      setTimeout(() => { m.classList.add('hidden'); }, 300);
     }
     function openAddModal() { openModal('addModal'); }
 
+    // Główne Rysowanie (Render)
     function refreshUI() {
       const curr = state.bills.filter(b => b.monthKey === state.currentMonthKey);
       let total = 0, paid = 0, pending = 0;
@@ -491,6 +532,10 @@
 
       renderDashboard(curr);
       renderTransactions(curr);
+      
+      // Wymuszamy aktualizację kalendarza i rocznego podsumowania na żywo z chmury!
+      if (!document.getElementById('section-calendar').classList.contains('hidden')) renderCalendar();
+      if (!document.getElementById('section-yearly').classList.contains('hidden')) renderYearlySummary();
     }
 
     function renderDashboard(curr) {
@@ -505,8 +550,8 @@
         const pct = ((sum/total)*100).toFixed(0);
         cc.innerHTML += `
           <div>
-            <div class="flex justify-between text-xs font-bold mb-1"><span class="text-slate-700 dark:text-slate-300">${cat}</span><span class="text-slate-900 dark:text-white">${sum.toFixed(2)} zł (${pct}%)</span></div>
-            <div class="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2"><div class="bg-emerald-500 h-2 rounded-full" style="width: ${pct}%"></div></div>
+            <div class="flex justify-between text-xs font-bold mb-1.5"><span class="text-slate-700 dark:text-slate-300">${cat}</span><span class="text-slate-900 dark:text-white">${sum.toFixed(2)} zł <span class="text-slate-400 font-normal">(${pct}%)</span></span></div>
+            <div class="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2.5 overflow-hidden"><div class="bg-emerald-500 h-2.5 rounded-full" style="width: ${pct}%"></div></div>
           </div>
         `;
       });
@@ -514,19 +559,19 @@
       const ul = document.getElementById('upcomingList');
       ul.innerHTML = '';
       const pend = curr.filter(b => b.status === 'PENDING').sort((a,b) => a.day - b.day).slice(0, 5);
-      if(pend.length === 0) ul.innerHTML = '<p class="text-slate-500 text-sm">Brak nadchodzących płatności.</p>';
+      if(pend.length === 0) ul.innerHTML = '<div class="p-6 text-center text-slate-500 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-dashed border-slate-200 dark:border-slate-700">Wszystko opłacone!</div>';
       pend.forEach(b => {
         ul.innerHTML += `
-          <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700/50">
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-500 font-black flex items-center justify-center flex-col leading-none">
-                <span class="text-sm">${b.day}</span><span class="text-[8px] uppercase">Dzień</span>
+          <div class="flex items-center justify-between p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700/50 hover:border-emerald-200 dark:hover:border-emerald-800/50 transition cursor-pointer" onclick="toggleBillStatus('${b.id}')">
+            <div class="flex items-center gap-4">
+              <div class="w-12 h-12 rounded-xl bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-500 font-black flex items-center justify-center flex-col leading-none shadow-sm">
+                <span class="text-base">${b.day}</span><span class="text-[9px] uppercase tracking-wider mt-0.5">Dzień</span>
               </div>
-              <div><p class="font-bold text-sm text-slate-900 dark:text-white">${b.name}</p><p class="text-xs text-slate-500">${b.category}</p></div>
+              <div><p class="font-bold text-sm text-slate-900 dark:text-white">${b.name}</p><p class="text-xs text-slate-500 mt-0.5">${b.category}</p></div>
             </div>
             <div class="text-right">
-              <p class="font-black text-sm text-slate-900 dark:text-white">${b.amount.toFixed(2)} zł</p>
-              <button onclick="toggleBillStatus('${b.id}')" class="text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline">Opłać</button>
+              <p class="font-black text-sm sm:text-base text-slate-900 dark:text-white">${b.amount.toFixed(2)} zł</p>
+              <button class="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 mt-0.5 hover:underline">Oznacz</button>
             </div>
           </div>
         `;
@@ -547,36 +592,36 @@
       tbody.innerHTML = ''; cards.innerHTML = '';
 
       if (filtered.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-slate-500">Brak rachunków.</td></tr>`;
-        cards.innerHTML = `<div class="p-8 text-center text-slate-500 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">Brak rachunków.</div>`;
+        tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-slate-500 font-medium">Brak rachunków.</td></tr>`;
+        cards.innerHTML = `<div class="p-8 text-center text-slate-500 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 font-medium">Brak rachunków.</div>`;
         return;
       }
 
       filtered.forEach(b => {
         const isPaid = b.status === 'PAID';
         
-        // Karty Mobile
+        // Karty dla Telefonów
         cards.innerHTML += `
-          <div class="p-4 rounded-2xl border transition-all shadow-sm flex items-center gap-4 ${isPaid ? 'bg-emerald-50/50 dark:bg-emerald-900/10 border-emerald-100 dark:border-emerald-900/30' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800'}">
-            <button onclick="toggleBillStatus('${b.id}')" class="shrink-0 w-12 h-12 flex items-center justify-center rounded-xl transition ${isPaid ? 'bg-emerald-500 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-400'}">
+          <div class="p-4 rounded-3xl border transition-all shadow-sm flex items-center gap-4 ${isPaid ? 'bg-emerald-50/50 dark:bg-emerald-900/10 border-emerald-100 dark:border-emerald-900/30' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-emerald-200 dark:hover:border-slate-700'}">
+            <button onclick="toggleBillStatus('${b.id}')" class="shrink-0 w-12 h-12 flex items-center justify-center rounded-2xl transition shadow-sm ${isPaid ? 'bg-emerald-500 text-white shadow-emerald-500/30' : 'bg-slate-100 dark:bg-slate-800 text-slate-400 hover:bg-emerald-100 hover:text-emerald-600'}">
               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
             </button>
-            <div class="flex-1 min-w-0">
-               <div class="flex justify-between items-baseline mb-0.5"><h3 class="font-bold text-slate-900 dark:text-white truncate pr-2 ${isPaid?'line-through opacity-70':''}">${b.name}</h3><span class="font-black text-slate-900 dark:text-white">${b.amount.toFixed(2)} zł</span></div>
-               <div class="flex items-center text-xs text-slate-500 gap-2"><span class="font-bold">${b.day} dnia</span><span class="px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 rounded-md">${b.category}</span></div>
+            <div class="flex-1 min-w-0 py-1">
+               <div class="flex justify-between items-baseline mb-1"><h3 class="font-bold text-slate-900 dark:text-white truncate pr-2 ${isPaid?'line-through opacity-60':''}">${b.name}</h3><span class="font-black text-slate-900 dark:text-white">${b.amount.toFixed(2)} zł</span></div>
+               <div class="flex items-center text-[11px] text-slate-500 gap-2"><span class="font-bold bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-md">${b.day} dnia</span><span class="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 rounded-md truncate">${b.category}</span></div>
             </div>
-            <button onclick="deleteBill('${b.id}')" class="p-2 text-slate-300 hover:text-red-500 transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
+            <button onclick="deleteBill('${b.id}')" class="p-2.5 text-slate-300 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
           </div>
         `;
 
-        // Tabela Desktop
+        // Tabela dla Komputerów
         tbody.innerHTML += `
-          <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/80 transition-colors ${isPaid?'opacity-70':''}">
-            <td class="px-6 py-4"><button onclick="toggleBillStatus('${b.id}')" class="flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold ${isPaid?'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40':'bg-slate-100 text-slate-600 dark:bg-slate-800'}"><div class="w-2 h-2 rounded-full ${isPaid?'bg-emerald-500':'bg-slate-400'}"></div>${isPaid?'Opłacone':'Do zapłaty'}</button></td>
-            <td class="px-6 py-4 font-bold text-slate-700 dark:text-slate-300">${b.day}</td>
-            <td class="px-6 py-4"><div class="font-bold text-slate-900 dark:text-white ${isPaid?'line-through':''}">${b.name}</div><div class="text-xs text-slate-500">${b.category}</div></td>
-            <td class="px-6 py-4 text-right font-black text-slate-900 dark:text-white">${b.amount.toFixed(2)} zł</td>
-            <td class="px-6 py-4 text-right"><button onclick="deleteBill('${b.id}')" class="p-2 text-slate-400 hover:text-red-500"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button></td>
+          <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/80 transition-colors ${isPaid?'opacity-60':''}">
+            <td class="px-6 py-4"><button onclick="toggleBillStatus('${b.id}')" class="flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-bold transition shadow-sm ${isPaid?'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40':'bg-slate-100 text-slate-600 dark:bg-slate-800 hover:bg-emerald-50 dark:hover:bg-emerald-900/20'}"><div class="w-2.5 h-2.5 rounded-full ${isPaid?'bg-emerald-500 shadow-sm shadow-emerald-500/50':'bg-slate-400'}"></div>${isPaid?'Opłacone':'Do zapłaty'}</button></td>
+            <td class="px-6 py-4 font-black text-slate-700 dark:text-slate-300">${b.day}</td>
+            <td class="px-6 py-4"><div class="font-bold text-slate-900 dark:text-white text-base ${isPaid?'line-through':''}">${b.name}</div><div class="text-xs text-slate-500 mt-0.5">${b.category}</div></td>
+            <td class="px-6 py-4 text-right font-black text-slate-900 dark:text-white text-base">${b.amount.toFixed(2)} zł</td>
+            <td class="px-6 py-4 text-right"><button onclick="deleteBill('${b.id}')" class="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button></td>
           </tr>
         `;
       });
@@ -591,61 +636,57 @@
       
       const curr = state.bills.filter(b => b.monthKey === state.currentMonthKey);
       
-      // Prosty kalendarz oparty na JS Date
       const [yearStr, monthStr] = state.currentMonthKey.split('-');
       const year = parseInt(yearStr);
       const month = parseInt(monthStr);
       
       const firstDayDate = new Date(year, month - 1, 1);
-      let startDay = firstDayDate.getDay(); // 0 to Niedziela
-      startDay = startDay === 0 ? 7 : startDay; // Przesunięcie dla PN = 1
+      let startDay = firstDayDate.getDay(); 
+      startDay = startDay === 0 ? 7 : startDay; 
       const daysInMonth = new Date(year, month, 0).getDate();
 
-      // Zmienne do oznaczania "dzisiejszego" dnia
       const today = new Date();
       const currentYear = today.getFullYear();
       const currentMonth = today.getMonth() + 1;
       const currentDay = today.getDate();
 
-      // Puste miejsca na początku
-      for(let i=1; i<startDay; i++) { grid.innerHTML += `<div class="p-2 sm:p-4 rounded-xl"></div>`; }
+      for(let i=1; i<startDay; i++) { grid.innerHTML += `<div class="p-2 sm:p-4 rounded-2xl"></div>`; }
       
       for(let i=1; i<=daysInMonth; i++) {
          const dayBills = curr.filter(b => b.day === i);
          let dots = '';
          
-         // Wyraźne czerwone kropki dla nieopłaconych, zielone dla opłaconych
          dayBills.forEach(b => { 
+           // NIEOPŁACONE = Czerwona kropka, OPŁACONE = Zielona kropka
            dots += `<div class="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full ${b.status === 'PAID' ? 'bg-emerald-500' : 'bg-red-500'} shadow-sm" title="${b.name}"></div>`; 
          });
          
          const hasPending = dayBills.some(b => b.status === 'PENDING');
          const isToday = (year === currentYear && month === currentMonth && i === currentDay);
          
-         // Style dla okienka (podświetlenie całego dnia)
+         // Wyraźne podświetlenie tła dla nieopłaconych (czerwonawe)
          let tileBg = hasPending 
-            ? 'border-red-200 bg-red-50 dark:border-red-900/50 dark:bg-red-900/20' 
-            : 'border-slate-100 bg-white dark:border-slate-800 dark:bg-slate-900';
+            ? 'border-red-200 bg-red-50 dark:border-red-900/40 dark:bg-red-950' 
+            : 'border-slate-100 bg-white dark:border-slate-800/80 dark:bg-slate-900';
          
-         // Dodanie mocnej ramki, jeśli to dzisiaj
+         // Jeśli dzisiaj, daj mocną ramkę
          if (isToday) {
-             tileBg += ' ring-2 ring-indigo-500 dark:ring-indigo-400 shadow-md';
+             tileBg += ' ring-2 ring-indigo-500 dark:ring-indigo-500 shadow-md transform scale-105 z-10';
          }
 
-         // Style dla numeru dnia
+         // Styl numeru: jeśli dzisiaj, jest w granatowym kółku
          let textStyle = hasPending 
             ? 'text-red-700 dark:text-red-500' 
             : 'text-slate-700 dark:text-slate-300';
          
-         // Kółko wokół numeru, jeśli to dzisiaj
          if (isToday) {
-             textStyle = 'bg-indigo-600 dark:bg-indigo-500 text-white rounded-full w-6 h-6 sm:w-7 sm:h-7 flex items-center justify-center';
+             textStyle = 'bg-indigo-600 dark:bg-indigo-600 text-white rounded-full w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center';
          }
 
          grid.innerHTML += `
-           <div class="p-2 sm:p-4 rounded-xl border flex flex-col items-center transition-all ${tileBg}">
+           <div class="p-2 sm:p-4 rounded-2xl border flex flex-col items-center transition-all duration-200 ${tileBg}">
              <span class="text-xs sm:text-sm font-bold ${textStyle}">${i}</span>
-             <div class="flex flex-wrap justify-center gap-1 mt-1.5 sm:mt-2 h-4">${dots}</div>
+             <div class="flex flex-wrap justify-center gap-1 mt-2 h-3 sm:h-4">${dots}</div>
            </div>
          `;
       }
@@ -665,22 +706,22 @@
         
         tb.innerHTML += `
           <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/80 transition cursor-pointer" onclick="switchMonth('${m.key}'); switchTab('dashboard');">
-            <td class="p-3 font-bold text-slate-900 dark:text-white">${m.label}</td>
-            <td class="p-3 text-center text-slate-500">${mBills.length}</td>
-            <td class="p-3 text-right font-bold text-slate-700 dark:text-slate-300">${t.toFixed(2)} zł</td>
-            <td class="p-3 text-right font-bold text-emerald-600 dark:text-emerald-400">${p.toFixed(2)} zł</td>
-            <td class="p-3 text-right font-bold text-amber-600 dark:text-amber-500">${(t-p).toFixed(2)} zł</td>
+            <td class="p-4 font-bold text-slate-900 dark:text-white flex items-center gap-2"><div class="w-2 h-2 rounded-full ${t===0?'bg-slate-300 dark:bg-slate-700':'bg-emerald-500'}"></div> ${m.label}</td>
+            <td class="p-4 text-center text-slate-500 font-bold">${mBills.length}</td>
+            <td class="p-4 text-right font-black text-slate-700 dark:text-slate-300">${t.toFixed(2)} zł</td>
+            <td class="p-4 text-right font-black text-emerald-600 dark:text-emerald-400">${p.toFixed(2)} zł</td>
+            <td class="p-4 text-right font-black text-amber-600 dark:text-amber-500">${(t-p).toFixed(2)} zł</td>
           </tr>
         `;
       });
 
       tb.innerHTML += `
-        <tr class="bg-slate-100 dark:bg-slate-800 font-black text-slate-900 dark:text-white border-t-2 border-slate-300 dark:border-slate-600">
-          <td class="p-3">RAZEM (13 m-cy)</td>
-          <td class="p-3 text-center">-</td>
-          <td class="p-3 text-right">${gt.toFixed(2)} zł</td>
-          <td class="p-3 text-right text-emerald-600 dark:text-emerald-400">${gp.toFixed(2)} zł</td>
-          <td class="p-3 text-right text-amber-600 dark:text-amber-500">${(gt-gp).toFixed(2)} zł</td>
+        <tr class="bg-slate-100 dark:bg-slate-800 font-black text-slate-900 dark:text-white border-t-4 border-slate-300 dark:border-slate-700 text-base">
+          <td class="p-4 rounded-bl-xl">RAZEM (13 M-CY)</td>
+          <td class="p-4 text-center">-</td>
+          <td class="p-4 text-right">${gt.toFixed(2)} zł</td>
+          <td class="p-4 text-right text-emerald-600 dark:text-emerald-400">${gp.toFixed(2)} zł</td>
+          <td class="p-4 text-right text-amber-600 dark:text-amber-500 rounded-br-xl">${(gt-gp).toFixed(2)} zł</td>
         </tr>
       `;
     }
@@ -689,12 +730,12 @@
       const list = document.getElementById('categoriesList');
       list.innerHTML = '';
       state.categories.forEach(c => {
-         list.innerHTML += `<div class="flex items-center gap-2 px-3 py-1.5 bg-slate-100 dark:bg-slate-800 rounded-lg text-sm font-bold text-slate-700 dark:text-slate-300">${c} <button onclick="deleteCategory('${c}')" class="text-red-500 hover:text-red-700 ml-2">&times;</button></div>`;
+         list.innerHTML += `<div class="flex items-center gap-3 px-4 py-2.5 bg-slate-100 dark:bg-slate-800 rounded-xl text-sm font-bold text-slate-700 dark:text-slate-300 shadow-sm border border-slate-200 dark:border-slate-700">${c} <button onclick="deleteCategory('${c}')" class="text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 p-1 rounded-lg transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"/></svg></button></div>`;
       });
       buildSelectors();
     }
 
-    // Akcje Modyfikujące
+    // Akcje Modyfikujące (Zapis / Edycja)
     function toggleBillStatus(id) {
       const b = state.bills.find(x => x.id === id);
       if (b) { b.status = b.status === 'PENDING' ? 'PAID' : 'PENDING'; saveLocal(); refreshUI(); }
@@ -711,7 +752,7 @@
       const day = parseInt(document.getElementById('addDay').value);
       const cat = document.getElementById('addCategorySel').value;
 
-      if(!name || isNaN(amount) || isNaN(day) || day < 1 || day > 31) { showToast('Uzupełnij poprawnie pola', 'error'); return; }
+      if(!name || isNaN(amount) || isNaN(day) || day < 1 || day > 31) { showToast('Uzupełnij poprawnie pola (Nazwa, Kwota, Dzień)', 'error'); return; }
 
       state.bills.push({
         id: 'b-' + Math.random().toString(36).substr(2, 9),
@@ -719,8 +760,9 @@
         name: name, amount: amount, day: day, category: cat, status: 'PENDING'
       });
       
-      saveLocal(); refreshUI(); closeModal('addModal'); showToast('Dodano rachunek', 'success');
+      saveLocal(); refreshUI(); closeModal('addModal'); showToast('Zapisano pomyślnie!', 'success');
       document.getElementById('addName').value = '';
+      document.getElementById('addAmount').value = '';
     }
 
     function addCategory() {
@@ -734,11 +776,11 @@
 
     function copyToNextMonth() {
       const idx = MONTHS.findIndex(m => m.key === state.currentMonthKey);
-      if (idx === -1 || idx === MONTHS.length - 1) { showToast('To ostatni miesiąc', 'error'); return; }
+      if (idx === -1 || idx === MONTHS.length - 1) { showToast('To ostatni miesiąc w cyklu', 'error'); return; }
       
       const nextKey = MONTHS[idx + 1].key;
       const curr = state.bills.filter(b => b.monthKey === state.currentMonthKey);
-      if (curr.length === 0) { showToast('Brak rachunków', 'error'); return; }
+      if (curr.length === 0) { showToast('Brak rachunków do skopiowania', 'error'); return; }
       
       let copied = 0;
       curr.forEach(b => {
@@ -748,17 +790,17 @@
         }
       });
       
-      if(copied > 0) { saveLocal(); showToast(`Skopiowano ${copied} poz.`, 'success'); switchMonth(nextKey); }
-      else showToast('Wszystko już istnieje w kol. m-cu', 'error');
+      if(copied > 0) { saveLocal(); showToast(`Skopiowano ${copied} poz. do kolejnego m-ca`, 'success'); switchMonth(nextKey); }
+      else showToast('Wszystkie rachunki już istnieją w kolejnym m-cu', 'error');
     }
 
-    // Inicjalizacja Startowa
+    // Inicjalizacja Startowa Aplikacji
     window.onload = () => {
       buildSelectors();
       switchTab('dashboard');
       if (state.supaUrl && state.supaKey) {
         pullFromSupabase();
-        cloudInterval = setInterval(pullFromSupabase, 5000);
+        cloudInterval = setInterval(pullFromSupabase, 4000); // Live sync co 4 sekundy
       }
     };
   </script>
