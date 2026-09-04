@@ -12,6 +12,7 @@
   <meta name="apple-mobile-web-app-title" content="Planner 26/27" />
   <meta name="application-name" content="Planner Płatności" />
   <meta name="description" content="Prywatny planner płatności i rachunków domowych na cykl Wrzesień 2026 – Wrzesień 2027." />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='24' fill='%23059669'/%3E%3Cpath d='M30 45 L45 60 L70 35' fill='none' stroke='white' stroke-width='10' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
   <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='24' fill='%23059669'/%3E%3Cpath d='M30 45 L45 60 L70 35' fill='none' stroke='white' stroke-width='10' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
   <link id="manifest-placeholder" rel="manifest" />
@@ -44,6 +45,10 @@
     }
   </script>
   <style>
+    html, body {
+      overflow-x: hidden;
+      max-width: 100vw;
+    }
     ::-webkit-scrollbar {
       width: 6px;
       height: 6px;
@@ -66,101 +71,101 @@
       font-weight: 600;
       border-radius: 9999px;
     }
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
   </style>
 </head>
-<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col font-sans selection:bg-emerald-100 selection:text-emerald-900">
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200 antialiased min-h-screen flex flex-col font-sans selection:bg-emerald-100 selection:text-emerald-900 transition-colors duration-200">
 
   <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
-  <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-xs">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex items-center justify-between h-16 sm:h-20 gap-4">
+  <header class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-40 shadow-xs">
+    <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+      
+      <!-- Górny wiersz nagłówka: Logo i akcje -->
+      <div class="flex items-center justify-between h-14 sm:h-16 gap-2">
         
-        <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 flex items-center justify-center text-white shadow-md shadow-emerald-500/20">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <!-- Lewa strona: Logo i Tytuł -->
+        <div class="flex items-center gap-2 sm:gap-3 min-w-0">
+          <div class="w-8 h-8 sm:w-10 sm:h-10 shrink-0 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 flex items-center justify-center text-white shadow-md shadow-emerald-500/20">
+            <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           </div>
-          <div>
+          <div class="min-w-0">
             <div class="flex items-center gap-2">
-              <h1 class="text-lg sm:text-xl font-bold text-slate-900 leading-tight">Planner Płatności</h1>
-              <span class="bg-emerald-100 text-emerald-800 text-[11px] font-bold px-2 py-0.5 rounded-full border border-emerald-200 uppercase tracking-wider">2026 - 2027</span>
+              <h1 class="text-sm sm:text-xl font-bold text-slate-900 dark:text-white leading-tight truncate">Planner Płatności</h1>
+              <span class="hidden sm:inline-block bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-300 text-[10px] sm:text-[11px] font-bold px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800 uppercase tracking-wider shrink-0">26-27</span>
             </div>
-            <p class="text-xs text-slate-500 hidden sm:block">Zarządzaj rachunkami, terminami i budżetem domowym</p>
+            <p class="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 hidden sm:block truncate">Zarządzaj rachunkami, terminami i budżetem domowym</p>
           </div>
         </div>
 
-        <!-- Month Navigation Controls -->
-        <div class="flex items-center gap-2 bg-slate-100 p-1.5 rounded-xl border border-slate-200">
-          <button id="btnPrevMonth" title="Poprzedni miesiąc" class="p-1.5 text-slate-600 hover:text-slate-900 hover:bg-white rounded-lg transition">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-          </button>
+        <!-- Prawa strona: Akcje -->
+        <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
           
-          <select id="selectCurrentMonth" class="bg-white border-0 text-slate-800 font-semibold text-sm rounded-lg py-1 px-3 shadow-xs focus:ring-2 focus:ring-emerald-500 cursor-pointer">
-          </select>
-
-          <button id="btnNextMonth" title="Następny miesiąc" class="p-1.5 text-slate-600 hover:text-slate-900 hover:bg-white rounded-lg transition">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+          <!-- Przełącznik Dark Mode -->
+          <button onclick="toggleTheme()" class="p-1.5 sm:p-2 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition" title="Tryb Jasny/Ciemny">
+            <svg id="themeIconSun" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+            <svg id="themeIconMoon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
           </button>
-        </div>
 
-        <div class="flex items-center gap-2">
-          <!-- Install PWA Button (Hidden by default, shown when installable or clicked) -->
-          <button id="btnPwaInstall" onclick="handlePwaInstallClick()" class="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200 rounded-xl hover:bg-emerald-100 transition shadow-xs" title="Zainstaluj planner jako aplikację na telefonie lub komputerze">
-            <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
-            <span class="hidden sm:inline">Zainstaluj PWA</span>
-            <span class="sm:hidden">Zainstaluj</span>
+          <!-- Install PWA Button (Hidden by default) -->
+          <button id="btnPwaInstall" onclick="handlePwaInstallClick()" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-emerald-800 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800 rounded-lg hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition shadow-xs" title="Zainstaluj planner">
+            <svg class="w-4 h-4 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+            <span>Zainstaluj</span>
           </button>
 
           <!-- Przycisk Synchronizacji w Chmurze -->
-          <button id="btnOpenSync" onclick="openModal('syncModal')" class="inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold text-emerald-900 bg-emerald-100/80 hover:bg-emerald-200/80 border border-emerald-300 rounded-xl transition shadow-xs cursor-pointer" title="Synchronizacja w chmurze (Telefon ⇄ Komputer)">
-            <span id="cloudStatusDot" class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-            <svg class="w-4 h-4 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <button id="btnOpenSync" onclick="openModal('syncModal')" class="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold text-emerald-900 dark:text-emerald-100 bg-emerald-100/80 dark:bg-emerald-900/50 hover:bg-emerald-200/80 dark:hover:bg-emerald-800/60 border border-emerald-300 dark:border-emerald-700 rounded-lg transition shadow-xs cursor-pointer" title="Synchronizacja w chmurze (Telefon ⇄ Komputer)">
+            <span id="cloudStatusDot" class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <svg class="w-4 h-4 text-emerald-700 dark:text-emerald-400 hidden sm:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 00-9.78 2.096A4.001 4.001 0 003 15z"/>
             </svg>
-            <span id="cloudStatusLabel" class="font-bold">Chmura: Aktywna</span>
+            <span id="cloudStatusLabel" class="font-bold hidden sm:inline">Chmura</span>
           </button>
 
-          <div class="hidden lg:flex items-center gap-2">
-            <button onclick="exportPlannerCSV()" class="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-slate-700 bg-white border border-slate-300 rounded-xl hover:bg-slate-50 transition shadow-xs">
-              <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-              Eksportuj CSV
-            </button>
-            <button onclick="openModal('addBillModal')" class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl transition shadow-sm shadow-emerald-600/30">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-              Nowa Płatność
-            </button>
-          </div>
+          <button onclick="openModal('addBillModal')" class="inline-flex items-center justify-center p-1.5 sm:px-3 sm:py-1.5 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition shadow-sm shadow-emerald-600/30">
+            <svg class="w-5 h-5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+            <span class="hidden sm:inline ml-1">Nowa</span>
+          </button>
+
         </div>
+      </div>
+
+      <!-- Dolny wiersz nagłówka: Przełącznik miesięcy -->
+      <div class="py-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-4 overflow-x-auto no-scrollbar">
+        
+        <div class="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-lg border border-slate-200 dark:border-slate-700 w-full sm:w-auto justify-between sm:justify-start">
+          <button id="btnPrevMonth" title="Poprzedni miesiąc" class="p-1.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-slate-700 rounded transition shrink-0">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+          </button>
+          
+          <select id="selectCurrentMonth" class="bg-transparent border-0 text-slate-800 dark:text-slate-200 font-semibold text-sm py-1 px-2 focus:ring-0 cursor-pointer w-full text-center sm:w-auto appearance-none">
+          </select>
+
+          <button id="btnNextMonth" title="Następny miesiąc" class="p-1.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-slate-700 rounded transition shrink-0">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+          </button>
+        </div>
+        
+        <button onclick="exportPlannerCSV()" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition shadow-xs shrink-0">
+          <svg class="w-4 h-4 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+          Eksportuj CSV
+        </button>
 
       </div>
     </div>
   </header>
 
-  <div class="bg-white border-b border-slate-200">
+  <div class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <nav class="flex space-x-6 overflow-x-auto py-2.5" aria-label="Tabs">
-        <button onclick="switchTab('dashboard')" id="tab-dashboard" class="tab-btn inline-flex items-center gap-2 py-1.5 px-3 text-sm font-semibold border-b-2 border-emerald-600 text-emerald-700 transition">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-          Start Here & Pulpit
-        </button>
-        <button onclick="switchTab('transactions')" id="tab-transactions" class="tab-btn inline-flex items-center gap-2 py-1.5 px-3 text-sm font-medium text-slate-500 hover:text-slate-900 border-b-2 border-transparent transition">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
-          Miesięczne Płatności
-          <span id="tabCountBadge" class="bg-slate-100 text-slate-600 text-xs px-2 py-0.5 rounded-full font-bold">0</span>
-        </button>
-        <button onclick="switchTab('calendar')" id="tab-calendar" class="tab-btn inline-flex items-center gap-2 py-1.5 px-3 text-sm font-medium text-slate-500 hover:text-slate-900 border-b-2 border-transparent transition">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-          Widok Kalendarza
-        </button>
-        <button onclick="switchTab('yearly')" id="tab-yearly" class="tab-btn inline-flex items-center gap-2 py-1.5 px-3 text-sm font-medium text-slate-500 hover:text-slate-900 border-b-2 border-transparent transition">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-          Roczne Zestawienie
-        </button>
-        <button onclick="switchTab('customize')" id="tab-customize" class="tab-btn inline-flex items-center gap-2 py-1.5 px-3 text-sm font-medium text-slate-500 hover:text-slate-900 border-b-2 border-transparent transition">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-          Customize Here (Kategorie i Konta)
+      <nav class="flex space-x-6 overflow-x-auto py-2.5 no-scrollbar" aria-label="Tabs">
         </button>
       </nav>
     </div>
@@ -171,57 +176,57 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       
       <!-- Total Bills -->
-      <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs relative overflow-hidden">
-        <div class="flex items-center justify-between text-slate-500 mb-2">
-          <span class="text-xs font-semibold uppercase tracking-wider">Razem do zapłaty</span>
-          <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
+      <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800 shadow-xs relative overflow-hidden">
+        <div class="flex items-center justify-between text-slate-500 dark:text-slate-400 mb-2">
+          <span class="text-[10px] sm:text-xs font-semibold uppercase tracking-wider">Razem do zapłaty</span>
+          <div class="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
           </div>
         </div>
-        <div class="text-2xl font-bold text-slate-900" id="kpiTotal">0,00 zł</div>
-        <p class="text-xs text-slate-500 mt-1" id="kpiTotalSub">Liczba pozycji: 0</p>
+        <div class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white truncate" id="kpiTotal">0,00 zł</div>
+        <p class="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 mt-1" id="kpiTotalSub">Liczba pozycji: 0</p>
       </div>
 
       <!-- Paid Bills -->
-      <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs relative overflow-hidden">
-        <div class="flex items-center justify-between text-slate-500 mb-2">
-          <span class="text-xs font-semibold uppercase tracking-wider">Już Opłacone</span>
-          <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+      <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800 shadow-xs relative overflow-hidden">
+        <div class="flex items-center justify-between text-slate-500 dark:text-slate-400 mb-2">
+          <span class="text-[10px] sm:text-xs font-semibold uppercase tracking-wider">Już Opłacone</span>
+          <div class="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
           </div>
         </div>
-        <div class="text-2xl font-bold text-emerald-600" id="kpiPaid">0,00 zł</div>
-        <div class="w-full bg-slate-100 h-1.5 rounded-full mt-2 overflow-hidden">
+        <div class="text-xl sm:text-2xl font-bold text-emerald-600 dark:text-emerald-400 truncate" id="kpiPaid">0,00 zł</div>
+        <div class="w-full bg-slate-100 dark:bg-slate-800 h-1.5 rounded-full mt-2 overflow-hidden">
           <div id="kpiProgressBar" class="bg-emerald-500 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
         </div>
-        <p class="text-xs text-slate-500 mt-1 flex justify-between" id="kpiPaidSub">
+        <p class="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 mt-1 flex justify-between" id="kpiPaidSub">
           <span>0 opłaconych</span>
           <span id="kpiPercentText">0%</span>
         </p>
       </div>
 
       <!-- Pending / Remaining -->
-      <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs relative overflow-hidden">
-        <div class="flex items-center justify-between text-slate-500 mb-2">
-          <span class="text-xs font-semibold uppercase tracking-wider">Pozostało do zapłaty</span>
-          <div class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
+      <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800 shadow-xs relative overflow-hidden">
+        <div class="flex items-center justify-between text-slate-500 dark:text-slate-400 mb-2">
+          <span class="text-[10px] sm:text-xs font-semibold uppercase tracking-wider">Pozostało do zapłaty</span>
+          <div class="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
           </div>
         </div>
-        <div class="text-2xl font-bold text-amber-600" id="kpiRemaining">0,00 zł</div>
-        <p class="text-xs text-slate-500 mt-1" id="kpiRemainingSub">0 płatności oczekujących</p>
+        <div class="text-xl sm:text-2xl font-bold text-amber-600 dark:text-amber-400 truncate" id="kpiRemaining">0,00 zł</div>
+        <p class="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 mt-1" id="kpiRemainingSub">0 płatności oczekujących</p>
       </div>
 
       <!-- Overdue or Next Due Date -->
-      <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs relative overflow-hidden">
-        <div class="flex items-center justify-between text-slate-500 mb-2">
-          <span class="text-xs font-semibold uppercase tracking-wider">Status & Pilne</span>
-          <div class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center">
+      <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800 shadow-xs relative overflow-hidden">
+        <div class="flex items-center justify-between text-slate-500 dark:text-slate-400 mb-2">
+          <span class="text-[10px] sm:text-xs font-semibold uppercase tracking-wider">Status & Pilne</span>
+          <div class="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
           </div>
         </div>
-        <div class="text-base font-bold text-slate-800" id="kpiNextDue">Brak pilnych</div>
-        <p class="text-xs text-slate-500 mt-1" id="kpiNextDueSub">Wszystko pod kontrolą</p>
+        <div class="text-sm sm:text-base font-bold text-slate-800 dark:text-slate-200 truncate" id="kpiNextDue">Brak pilnych</div>
+        <p class="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 mt-1 truncate" id="kpiNextDueSub">Wszystko pod kontrolą</p>
       </div>
 
     </div>
@@ -260,20 +265,20 @@
 
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
-        <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs lg:col-span-2">
-          <div class="flex items-center justify-between mb-4">
-            <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
-              <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-              Struktura wydatków wg kategorii (<span id="dashMonthLabel">Wrzesień 2026</span>)
+        <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-6 border border-slate-200 dark:border-slate-800 shadow-xs lg:col-span-2">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+            <h3 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white flex items-center gap-2 leading-tight">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0"></span>
+              <span class="truncate">Struktura wydatków wg kategorii (<span id="dashMonthLabel">Wrzesień 2026</span>)</span>
             </h3>
-            <button onclick="switchTab('customize')" class="text-xs font-semibold text-emerald-600 hover:text-emerald-700">Edytuj kategorie &rarr;</button>
+            <button onclick="switchTab('customize')" class="text-[11px] sm:text-xs font-semibold text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 text-left sm:text-right shrink-0">Edytuj kategorie &rarr;</button>
           </div>
           <div id="categoryBreakdownContainer" class="space-y-3"></div>
         </div>
 
-        <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs">
-          <h3 class="text-base font-bold text-slate-900 mb-4 flex items-center gap-2">
-            <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-6 border border-slate-200 dark:border-slate-800 shadow-xs">
+          <h3 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+            <svg class="w-5 h-5 text-amber-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
             Najbliższe płatności
           </h3>
           <div id="dashUpcomingContainer" class="space-y-3"></div>
@@ -285,44 +290,47 @@
 
     <section id="section-transactions" class="hidden space-y-4">
       
-      <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-wrap items-center justify-between gap-3">
-        <div class="flex flex-wrap items-center gap-2">
+      <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs flex flex-wrap items-center justify-between gap-3">
+        <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
           
-          <div class="relative">
-            <input type="text" id="billSearch" placeholder="Szukaj płatności..." oninput="renderTransactionsTable()" class="pl-9 pr-3 py-2 text-xs sm:text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-hidden w-48 sm:w-64 bg-slate-50 focus:bg-white" />
+          <div class="relative w-full sm:w-auto">
+            <input type="text" id="billSearch" placeholder="Szukaj płatności..." oninput="renderTransactionsTable()" class="pl-9 pr-3 py-2 text-xs sm:text-sm border border-slate-300 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-hidden w-full sm:w-64 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:bg-white dark:focus:bg-slate-900" />
             <svg class="w-4 h-4 text-slate-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
           </div>
 
-          <select id="filterStatus" onchange="renderTransactionsTable()" class="text-xs sm:text-sm border border-slate-300 rounded-xl px-3 py-2 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-emerald-500">
+          <select id="filterStatus" onchange="renderTransactionsTable()" class="flex-1 sm:flex-none text-xs sm:text-sm border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500">
             <option value="ALL">Wszystkie statusy</option>
             <option value="PENDING">Tylko do zapłaty</option>
             <option value="PAID">Tylko opłacone</option>
             <option value="AUTOPAY">Autopłatność</option>
           </select>
 
-          <select id="filterCategory" onchange="renderTransactionsTable()" class="text-xs sm:text-sm border border-slate-300 rounded-xl px-3 py-2 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-emerald-500">
+          <select id="filterCategory" onchange="renderTransactionsTable()" class="flex-1 sm:flex-none text-xs sm:text-sm border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500">
             <option value="ALL">Wszystkie kategorie</option>
           </select>
         </div>
 
-        <div class="flex items-center gap-2">
-          <button onclick="copyCurrentMonthBillsToNext()" class="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded-xl transition" title="Kopiuj obecne płatności do kolejnego miesiąca jako nowe wzorce">
-            <svg class="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"/></svg>
-            Kopiuj na kolejny miesiąc
+        <div class="flex items-center justify-end w-full md:w-auto gap-2">
+          <button onclick="copyCurrentMonthBillsToNext()" class="flex-1 sm:flex-none justify-center inline-flex items-center gap-1.5 px-3 py-2 text-[11px] sm:text-xs font-semibold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl transition" title="Kopiuj obecne płatności do kolejnego miesiąca jako nowe wzorce">
+            <svg class="w-4 h-4 text-slate-600 dark:text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"/></svg>
+            <span class="hidden sm:inline">Kopiuj na kolejny miesiąc</span>
+            <span class="sm:hidden">Kopiuj</span>
           </button>
 
-          <button onclick="openModal('addBillModal')" class="inline-flex items-center gap-1.5 px-4 py-2 text-xs sm:text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl transition shadow-xs">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-            Dodaj Płatność
+          <button onclick="openModal('addBillModal')" class="flex-1 sm:flex-none justify-center inline-flex items-center gap-1.5 px-4 py-2 text-[11px] sm:text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl transition shadow-xs">
+            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+            Dodaj
           </button>
         </div>
       </div>
 
-      <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
-        <div class="overflow-x-auto">
+      <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs overflow-hidden">
+        
+        <!-- Tabela dla komputerów -->
+        <div class="overflow-x-auto hidden md:block">
           <table class="w-full text-left border-collapse text-sm">
             <thead>
-              <tr class="bg-slate-50 border-b border-slate-200 text-slate-600 font-semibold text-xs uppercase tracking-wider">
+              <tr class="bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-semibold text-xs uppercase tracking-wider">
                 <th class="py-3 px-4 w-12 text-center">Status</th>
                 <th class="py-3 px-4">Nazwa Płatności / Odbiorca</th>
                 <th class="py-3 px-4">Kategoria</th>
@@ -333,10 +341,13 @@
                 <th class="py-3 px-4 text-center w-24">Akcje</th>
               </tr>
             </thead>
-            <tbody id="billsTableBody" class="divide-y divide-slate-100 text-slate-800 font-medium">
+            <tbody id="billsTableBody" class="divide-y divide-slate-100 dark:divide-slate-800 text-slate-800 dark:text-slate-200 font-medium">
             </tbody>
           </table>
         </div>
+
+        <!-- Karty dla telefonów komórkowych -->
+        <div id="billsMobileCards" class="md:hidden p-3 space-y-3 bg-slate-50/50 dark:bg-slate-900"></div>
 
         <div id="tableEmptyState" class="hidden text-center py-12 px-4">
           <div class="w-12 h-12 rounded-full bg-slate-100 text-slate-400 mx-auto flex items-center justify-center mb-3">
