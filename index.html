@@ -706,6 +706,49 @@
     import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
     import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
+    let currentTheme = localStorage.getItem('planner_theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+
+    function applyTheme(theme) {
+      currentTheme = theme;
+      localStorage.setItem('planner_theme', theme);
+      const isDark = theme === 'dark';
+      
+      if (isDark) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+
+      const iconSun = document.getElementById('themeIconSun');
+      const iconMoon = document.getElementById('themeIconMoon');
+      const metaThemeColor = document.getElementById('metaThemeColor');
+      const metaStatusBar = document.getElementById('metaStatusBar');
+
+      if (iconSun && iconMoon) {
+        if (isDark) {
+          iconSun.classList.remove('hidden');
+          iconMoon.classList.add('hidden');
+        } else {
+          iconSun.classList.add('hidden');
+          iconMoon.classList.remove('hidden');
+        }
+      }
+
+      if (metaThemeColor) {
+        metaThemeColor.setAttribute('content', isDark ? '#090d16' : '#059669');
+      }
+      if (metaStatusBar) {
+        metaStatusBar.setAttribute('content', isDark ? 'black-translucent' : 'default');
+      }
+    }
+
+    function toggleTheme() {
+      applyTheme(currentTheme === 'dark' ? 'light' : 'dark');
+      showToast(currentTheme === 'dark' ? 'Włączono tryb ciemny 🌙' : 'Włączono tryb jasny ☀️', 'info');
+    }
+
+    window.toggleTheme = toggleTheme;
+
     const MONTHS_CYCLE = [
       { key: "2026-09", label: "Wrzesień 2026", days: 30, startDayOfWeek: 2 },
       { key: "2026-10", label: "Październik 2026", days: 31, startDayOfWeek: 4 },
@@ -772,7 +815,6 @@
 
     async function initCloudSync() {
       try {
-        // Read URL hash for pairing link (e.g., #sync=DOM-1234)
         if (window.location.hash && window.location.hash.startsWith('#sync=')) {
           const hashKey = window.location.hash.replace('#sync=', '').trim().toUpperCase();
           if (hashKey) {
@@ -794,7 +836,6 @@
         auth = getAuth(fbApp);
         db = getFirestore(fbApp);
 
-        // RULE 3: Auth Before Queries
         if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
           await signInWithCustomToken(auth, __initial_auth_token);
         } else {
@@ -821,13 +862,11 @@
         unsubscribeFirestore = null;
       }
 
-      // RULE 1: Strict public path /artifacts/{appId}/public/data/{collectionName}/{documentId}
       const safeCode = (syncCode || 'DOM-2026').replace(/[^a-zA-Z0-9_-]/g, '').toUpperCase() || 'DOM-2026';
       const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'planners', safeCode);
 
       updateCloudUIState(true, `Połączono (${safeCode})`);
 
-      // Real-time snapshot with error callback (CRITICAL)
       unsubscribeFirestore = onSnapshot(docRef, (docSnap) => {
         if (docSnap.exists()) {
           const remoteData = docSnap.data();
@@ -839,16 +878,15 @@
             if (remoteData.currency) state.currency = remoteData.currency;
             state.lastSyncedAt = remoteData.updatedAt;
 
-            saveState(false); // save locally without re-pushing
+            saveState(false);
             refreshUI();
             isRemoteUpdate = false;
 
             const timeEl = document.getElementById('syncTimeStatus');
-            if (timeEl) timeEl.textContent = 'Zsynchronizowano ' + new Date().toLocaleTimeString();
+            if (timeEl) timeEl.textContent = 'Zsynchronizowano ' + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
             showToast('Zaktualizowano dane z chmury.', 'info');
           }
         } else {
-          // Document does not exist yet for this code: upload current state
           pushStateToCloud();
         }
       }, (err) => {
@@ -875,7 +913,7 @@
         }, { merge: true });
 
         const timeEl = document.getElementById('syncTimeStatus');
-        if (timeEl) timeEl.textContent = 'Zapisano w chmurze ' + new Date().toLocaleTimeString();
+        if (timeEl) timeEl.textContent = 'Zapisano w chmurze ' + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
       } catch (err) {
         console.warn('Nie udało się zapisać do chmury:', err);
       }
@@ -883,7 +921,6 @@
 
     function updateCloudUIState(isConnected, text) {
       const dot = document.getElementById('cloudStatusDot');
-      const label = document.getElementById('cloudStatusLabel');
       const modalStatus = document.getElementById('syncModalStatus');
 
       if (dot) {
@@ -891,7 +928,6 @@
           ? 'w-2 h-2 rounded-full bg-emerald-500 animate-pulse' 
           : 'w-2 h-2 rounded-full bg-slate-400';
       }
-      if (label) label.textContent = isConnected ? 'Połączono' : 'Chmura';
       if (modalStatus) modalStatus.textContent = text;
     }
 
@@ -929,7 +965,7 @@
           pushStateToCloud();
         }
       } catch (err) {
-        showToast('Nie udało się zapisać w LocalStorage.', 'warning');
+        showToast('Nie udało się zapisać danych.', 'warning');
       }
     }
 
@@ -954,7 +990,7 @@
       state.syncCode = newCode;
       localStorage.setItem(STORAGE_PREFIX + 'syncCode', newCode);
       connectToCloudProfile(newCode);
-      showToast(`Nowy kod profilu: ${newCode}`, 'info');
+      showToast(`Nowy kod: ${newCode}`, 'info');
     }
 
     function copySyncLink() {
@@ -969,7 +1005,7 @@
       document.execCommand('copy');
       document.body.removeChild(tempInput);
 
-      showToast('Skopiowano link parujący! Otwórz go na telefonie.', 'success');
+      showToast('Skopiowano link parujący!', 'success');
     }
 
     function formatMoney(amount) {
@@ -977,50 +1013,60 @@
     }
 
     function initMonthSelector() {
-      const select = document.getElementById('selectCurrentMonth');
-      if (!select) return;
-      select.innerHTML = '';
-      MONTHS_CYCLE.forEach(m => {
-        const opt = document.createElement('option');
-        opt.value = m.key;
-        opt.textContent = m.label;
-        if (m.key === state.currentMonthKey) opt.selected = true;
-        select.appendChild(opt);
+      const desktopSelect = document.getElementById('selectCurrentMonth');
+      const mobileSelect = document.getElementById('selectCurrentMonthMobile');
+      
+      [desktopSelect, mobileSelect].forEach(select => {
+        if (!select) return;
+        select.innerHTML = '';
+        MONTHS_CYCLE.forEach(m => {
+          const opt = document.createElement('option');
+          opt.value = m.key;
+          opt.textContent = m.label;
+          if (m.key === state.currentMonthKey) opt.selected = true;
+          select.appendChild(opt);
+        });
+
+        select.onchange = (e) => {
+          setMonth(e.target.value);
+        };
       });
 
-      select.onchange = (e) => {
-        setMonth(e.target.value);
+      const handlePrev = () => {
+        const idx = MONTHS_CYCLE.findIndex(m => m.key === state.currentMonthKey);
+        if (idx > 0) {
+          setMonth(MONTHS_CYCLE[idx - 1].key);
+        } else {
+          showToast('To pierwszy miesiąc cyklu (Wrzesień 2026).', 'info');
+        }
+      };
+
+      const handleNext = () => {
+        const idx = MONTHS_CYCLE.findIndex(m => m.key === state.currentMonthKey);
+        if (idx < MONTHS_CYCLE.length - 1) {
+          setMonth(MONTHS_CYCLE[idx + 1].key);
+        } else {
+          showToast('To ostatni miesiąc cyklu (Wrzesień 2027).', 'info');
+        }
       };
 
       const btnPrev = document.getElementById('btnPrevMonth');
-      if (btnPrev) {
-        btnPrev.onclick = () => {
-          const idx = MONTHS_CYCLE.findIndex(m => m.key === state.currentMonthKey);
-          if (idx > 0) {
-            setMonth(MONTHS_CYCLE[idx - 1].key);
-          } else {
-            showToast('To jest pierwszy miesiąc w harmonogramie (Wrzesień 2026).', 'info');
-          }
-        };
-      }
-
       const btnNext = document.getElementById('btnNextMonth');
-      if (btnNext) {
-        btnNext.onclick = () => {
-          const idx = MONTHS_CYCLE.findIndex(m => m.key === state.currentMonthKey);
-          if (idx < MONTHS_CYCLE.length - 1) {
-            setMonth(MONTHS_CYCLE[idx + 1].key);
-          } else {
-            showToast('To jest ostatni miesiąc w harmonogramie (Wrzesień 2027).', 'info');
-          }
-        };
-      }
+      const btnPrevMob = document.getElementById('btnPrevMonthMobile');
+      const btnNextMob = document.getElementById('btnNextMonthMobile');
+
+      if (btnPrev) btnPrev.onclick = handlePrev;
+      if (btnNext) btnNext.onclick = handleNext;
+      if (btnPrevMob) btnPrevMob.onclick = handlePrev;
+      if (btnNextMob) btnNextMob.onclick = handleNext;
     }
 
     function setMonth(monthKey) {
       state.currentMonthKey = monthKey;
-      const select = document.getElementById('selectCurrentMonth');
-      if (select) select.value = monthKey;
+      const s1 = document.getElementById('selectCurrentMonth');
+      const s2 = document.getElementById('selectCurrentMonthMobile');
+      if (s1) s1.value = monthKey;
+      if (s2) s2.value = monthKey;
       const monthObj = MONTHS_CYCLE.find(m => m.key === monthKey);
       if (monthObj) {
         const dashLabel = document.getElementById('dashMonthLabel');
@@ -1040,12 +1086,12 @@
         if (sec && btn) {
           if (t === tabId) {
             sec.classList.remove('hidden');
-            btn.classList.add('border-emerald-600', 'text-emerald-700');
-            btn.classList.remove('border-transparent', 'text-slate-500');
+            btn.classList.add('border-emerald-600', 'text-emerald-700', 'dark:text-emerald-400');
+            btn.classList.remove('border-transparent', 'text-slate-500', 'dark:text-slate-400');
           } else {
             sec.classList.add('hidden');
-            btn.classList.remove('border-emerald-600', 'text-emerald-700');
-            btn.classList.add('border-transparent', 'text-slate-500');
+            btn.classList.remove('border-emerald-600', 'text-emerald-700', 'dark:text-emerald-400');
+            btn.classList.add('border-transparent', 'text-slate-500', 'dark:text-slate-400');
           }
         }
       });
@@ -1077,25 +1123,25 @@
       const tabCountBadge = document.getElementById('tabCountBadge');
 
       if (kpiTotal) kpiTotal.textContent = formatMoney(totalAmount);
-      if (kpiTotalSub) kpiTotalSub.textContent = `Liczba pozycji: ${totalCount}`;
+      if (kpiTotalSub) kpiTotalSub.textContent = `Liczba: ${totalCount}`;
       if (kpiPaid) kpiPaid.textContent = formatMoney(paidAmount);
       if (kpiPaidSub) kpiPaidSub.innerHTML = `<span>${paidBills.length} opłaconych</span> <span>${percent}%</span>`;
       if (kpiProgressBar) kpiProgressBar.style.width = `${percent}%`;
       if (kpiRemaining) kpiRemaining.textContent = formatMoney(pendingAmount);
-      if (kpiRemainingSub) kpiRemainingSub.textContent = `${pendingBills.length} płatności oczekujących`;
+      if (kpiRemainingSub) kpiRemainingSub.textContent = `${pendingBills.length} oczekujących`;
 
       const sortedPending = [...pendingBills].sort((a, b) => Number(a.day) - Number(b.day));
       if (kpiNextDue && kpiNextDueSub) {
         if (sortedPending.length > 0) {
           const next = sortedPending[0];
           kpiNextDue.textContent = `${next.day}. dzień: ${next.name}`;
-          kpiNextDueSub.textContent = `Kwota: ${formatMoney(next.amount)}`;
+          kpiNextDueSub.textContent = formatMoney(next.amount);
         } else if (totalCount > 0) {
           kpiNextDue.textContent = 'Wszystko opłacone! 🎉';
-          kpiNextDueSub.textContent = 'Brak zaległości w tym miesiącu';
+          kpiNextDueSub.textContent = 'Brak zaległości';
         } else {
           kpiNextDue.textContent = 'Brak wpisów';
-          kpiNextDueSub.textContent = 'Dodaj swój pierwszy rachunek';
+          kpiNextDueSub.textContent = 'Dodaj płatność';
         }
       }
 
@@ -1111,7 +1157,7 @@
       const totalAmount = currentBills.reduce((acc, b) => acc + Number(b.amount || 0), 0);
 
       if (currentBills.length === 0) {
-        container.innerHTML = `<div class="text-xs text-slate-400 py-4 text-center">Brak danych dla tego miesiąca. Dodaj płatności w zakładce Miesięczne Płatności.</div>`;
+        container.innerHTML = `<div class="text-xs text-slate-400 py-3 text-center">Brak danych dla tego miesiąca.</div>`;
         return;
       }
 
@@ -1131,7 +1177,7 @@
         .sort((a, b) => map[b].total - map[a].total);
 
       if (sortedCats.length === 0) {
-        container.innerHTML = `<div class="text-xs text-slate-400 py-4 text-center">Wszystkie wydatki mają kwotę 0 zł.</div>`;
+        container.innerHTML = `<div class="text-xs text-slate-400 py-3 text-center">Wszystkie wydatki mają kwotę 0 zł.</div>`;
         return;
       }
 
@@ -1143,11 +1189,11 @@
         row.className = 'space-y-1';
         row.innerHTML = `
           <div class="flex items-center justify-between text-xs font-semibold">
-            <span class="text-slate-700">${escapeHTML(catName)} <span class="text-slate-400 font-normal">(${item.count})</span></span>
-            <span class="text-slate-900 font-bold">${formatMoney(item.total)} <span class="text-slate-400 font-normal">(${pct}%)</span></span>
+            <span class="text-slate-700 dark:text-slate-300 truncate max-w-[65%]">${escapeHTML(catName)} <span class="text-slate-400 font-normal">(${item.count})</span></span>
+            <span class="text-slate-900 dark:text-white font-bold">${formatMoney(item.total)} <span class="text-slate-400 font-normal">(${pct}%)</span></span>
           </div>
-          <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-            <div class="bg-emerald-600 h-full rounded-full transition-all duration-300" style="width: ${pct}%"></div>
+          <div class="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
+            <div class="bg-emerald-500 h-full rounded-full transition-all duration-300" style="width: ${pct}%"></div>
           </div>
         `;
         container.appendChild(row);
@@ -1164,10 +1210,9 @@
 
       if (pending.length === 0) {
         container.innerHTML = `
-          <div class="p-4 bg-emerald-50 rounded-xl border border-emerald-100 text-center">
-            <svg class="w-7 h-7 text-emerald-600 mx-auto mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-            <p class="text-xs font-bold text-emerald-800">Wszystkie rachunki są opłacone!</p>
-            <p class="text-[11px] text-emerald-600 mt-0.5">Brak zbliżających się terminów do zapłaty.</p>
+          <div class="p-3 bg-emerald-50 dark:bg-emerald-950/50 rounded-xl border border-emerald-100 dark:border-emerald-900 text-center">
+            <svg class="w-6 h-6 text-emerald-600 dark:text-emerald-400 mx-auto mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <p class="text-xs font-bold text-emerald-800 dark:text-emerald-300">Wszystkie rachunki są opłacone!</p>
           </div>
         `;
         return;
@@ -1175,22 +1220,22 @@
 
       pending.slice(0, 5).forEach(b => {
         const card = document.createElement('div');
-        card.className = 'flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200/80 hover:bg-slate-100/80 transition';
+        card.className = 'flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 transition';
         card.innerHTML = `
-          <div class="flex items-center gap-2.5">
-            <div class="w-9 h-9 rounded-lg bg-amber-100 text-amber-800 font-bold text-xs flex flex-col items-center justify-center leading-tight">
+          <div class="flex items-center gap-2 min-w-0">
+            <div class="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-950/70 text-amber-800 dark:text-amber-300 font-bold text-xs flex flex-col items-center justify-center leading-tight shrink-0">
               <span>${b.day}</span>
-              <span class="text-[9px] uppercase font-normal">dzień</span>
+              <span class="text-[8px] uppercase font-normal">dzień</span>
             </div>
-            <div>
-              <h5 class="text-xs font-bold text-slate-900 leading-tight">${escapeHTML(b.name)}</h5>
-              <span class="text-[11px] text-slate-500">${escapeHTML(b.category)}</span>
+            <div class="truncate">
+              <h5 class="text-xs font-bold text-slate-900 dark:text-white leading-tight truncate">${escapeHTML(b.name)}</h5>
+              <span class="text-[10px] text-slate-500 dark:text-slate-400 truncate">${escapeHTML(b.category)}</span>
             </div>
           </div>
-          <div class="text-right">
-            <div class="text-xs font-bold text-slate-900">${formatMoney(b.amount)}</div>
-            <button onclick="toggleBillStatus('${b.id}')" class="text-[10px] font-semibold text-emerald-600 hover:text-emerald-800 underline">
-              Oznacz: Zapłacone
+          <div class="text-right shrink-0">
+            <div class="text-xs font-bold text-slate-900 dark:text-white">${formatMoney(b.amount)}</div>
+            <button onclick="toggleBillStatus('${b.id}')" class="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 hover:underline">
+              Oznacz
             </button>
           </div>
         `;
@@ -1200,8 +1245,9 @@
 
     function renderTransactionsTable() {
       const tbody = document.getElementById('billsTableBody');
+      const mobileCards = document.getElementById('billsMobileCards');
       const emptyState = document.getElementById('tableEmptyState');
-      if (!tbody) return;
+      if (!tbody && !mobileCards) return;
 
       const searchInput = document.getElementById('billSearch');
       const statusFilterEl = document.getElementById('filterStatus');
@@ -1224,62 +1270,99 @@
         bills = bills.filter(b => b.category === catFilter);
       }
 
-      tbody.innerHTML = '';
+      if (tbody) tbody.innerHTML = '';
+      if (mobileCards) mobileCards.innerHTML = '';
 
       if (bills.length === 0) {
         if (emptyState) emptyState.classList.remove('hidden');
       } else {
         if (emptyState) emptyState.classList.add('hidden');
+        
         bills.forEach(bill => {
-          const tr = document.createElement('tr');
-          tr.className = 'hover:bg-slate-50/80 transition-colors border-b border-slate-100 group';
-
+          const isChecked = (bill.status === 'PAID' || bill.status === 'AUTOPAY');
+          
           let statusBadge = '';
           if (bill.status === 'PAID') {
-            statusBadge = `<span class="badge-pill bg-emerald-100 text-emerald-800 border border-emerald-200">Opłacone</span>`;
+            statusBadge = `<span class="badge-pill bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">Opłacone</span>`;
           } else if (bill.status === 'AUTOPAY') {
-            statusBadge = `<span class="badge-pill bg-indigo-100 text-indigo-800 border border-indigo-200">Autopłatność</span>`;
+            statusBadge = `<span class="badge-pill bg-indigo-100 dark:bg-indigo-950 text-indigo-800 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">Autopłatność</span>`;
           } else {
-            statusBadge = `<span class="badge-pill bg-amber-100 text-amber-800 border border-amber-200">Do zapłaty</span>`;
+            statusBadge = `<span class="badge-pill bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800">Do zapłaty</span>`;
           }
 
-          const isChecked = (bill.status === 'PAID' || bill.status === 'AUTOPAY');
+          // Desktop Row
+          if (tbody) {
+            const tr = document.createElement('tr');
+            tr.className = 'hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors border-b border-slate-100 dark:border-slate-800 group';
+            tr.innerHTML = `
+              <td class="py-3 px-4 text-center">
+                <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="toggleBillStatus('${bill.id}')" title="Przełącz status" class="w-4 h-4 rounded-md text-emerald-600 focus:ring-emerald-500 border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 cursor-pointer" />
+              </td>
+              <td class="py-3 px-4">
+                <div class="font-bold text-slate-900 dark:text-white">${escapeHTML(bill.name)}</div>
+                ${bill.notes ? `<div class="text-[11px] text-slate-400 truncate max-w-xs">${escapeHTML(bill.notes)}</div>` : ''}
+              </td>
+              <td class="py-3 px-4">
+                <span class="text-xs bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded border border-slate-200 dark:border-slate-700">${escapeHTML(bill.category || 'Ogólne')}</span>
+              </td>
+              <td class="py-3 px-4 font-semibold text-slate-700 dark:text-slate-300">
+                ${bill.day}. dzień
+              </td>
+              <td class="py-3 px-4 text-xs text-slate-600 dark:text-slate-400">
+                ${escapeHTML(bill.account || 'Konto')}
+              </td>
+              <td class="py-3 px-4 text-right font-bold text-slate-900 dark:text-white">
+                ${formatMoney(bill.amount)}
+              </td>
+              <td class="py-3 px-4">
+                ${statusBadge}
+              </td>
+              <td class="py-3 px-4 text-center">
+                <div class="flex items-center justify-center gap-1 opacity-80 group-hover:opacity-100">
+                  <button onclick="editBill('${bill.id}')" title="Edytuj" class="p-1 text-slate-500 hover:text-emerald-600 dark:hover:text-emerald-400 rounded transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                  </button>
+                  <button onclick="deleteBillConfirm('${bill.id}')" title="Usuń" class="p-1 text-slate-500 hover:text-red-600 dark:hover:text-red-400 rounded transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                  </button>
+                </div>
+              </td>
+            `;
+            tbody.appendChild(tr);
+          }
 
-          tr.innerHTML = `
-            <td class="py-3 px-4 text-center">
-              <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="toggleBillStatus('${bill.id}')" title="Przełącz status" class="w-4 h-4 rounded-md text-emerald-600 focus:ring-emerald-500 border-slate-300 cursor-pointer" />
-            </td>
-            <td class="py-3 px-4">
-              <div class="font-bold text-slate-900">${escapeHTML(bill.name)}</div>
-              ${bill.notes ? `<div class="text-[11px] text-slate-400 truncate max-w-xs">${escapeHTML(bill.notes)}</div>` : ''}
-            </td>
-            <td class="py-3 px-4">
-              <span class="text-xs bg-slate-100 text-slate-700 px-2.5 py-1 rounded-md border border-slate-200">${escapeHTML(bill.category || 'Ogólne')}</span>
-            </td>
-            <td class="py-3 px-4 font-semibold text-slate-700">
-              ${bill.day}. dzień
-            </td>
-            <td class="py-3 px-4 text-xs text-slate-600">
-              ${escapeHTML(bill.account || 'Konto Główne')}
-            </td>
-            <td class="py-3 px-4 text-right font-bold text-slate-900">
-              ${formatMoney(bill.amount)}
-            </td>
-            <td class="py-3 px-4">
-              ${statusBadge}
-            </td>
-            <td class="py-3 px-4 text-center">
-              <div class="flex items-center justify-center gap-1 opacity-80 group-hover:opacity-100">
-                <button onclick="editBill('${bill.id}')" title="Edytuj" class="p-1 text-slate-500 hover:text-emerald-600 rounded-md hover:bg-slate-100 transition">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
-                </button>
-                <button onclick="deleteBillConfirm('${bill.id}')" title="Usuń" class="p-1 text-slate-500 hover:text-red-600 rounded-md hover:bg-slate-100 transition">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                </button>
+          // Mobile Card View (Tailored for iPhone / Android touch)
+          if (mobileCards) {
+            const card = document.createElement('div');
+            card.className = `p-3 rounded-xl border transition-all ${isChecked ? 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800' : 'bg-white dark:bg-slate-900 border-amber-200/70 dark:border-amber-900/50 shadow-xs'}`;
+            card.innerHTML = `
+              <div class="flex items-start justify-between gap-2 mb-2">
+                <div class="flex items-center gap-2.5 min-w-0">
+                  <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="toggleBillStatus('${bill.id}')" class="w-5 h-5 rounded-md text-emerald-600 focus:ring-emerald-500 border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 cursor-pointer shrink-0" />
+                  <div class="truncate">
+                    <h4 class="text-sm font-bold text-slate-900 dark:text-white leading-tight truncate ${isChecked ? 'line-through opacity-70' : ''}">${escapeHTML(bill.name)}</h4>
+                    <span class="text-[10px] text-slate-500 dark:text-slate-400">${bill.day}. dzień m-ca • ${escapeHTML(bill.category)}</span>
+                  </div>
+                </div>
+                <div class="text-right shrink-0">
+                  <div class="text-sm font-extrabold text-slate-900 dark:text-white">${formatMoney(bill.amount)}</div>
+                  <span class="text-[10px] text-slate-400 block">${escapeHTML(bill.account || 'Konto')}</span>
+                </div>
               </div>
-            </td>
-          `;
-          tbody.appendChild(tr);
+              <div class="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800 text-xs">
+                <div>${statusBadge}</div>
+                <div class="flex items-center gap-3">
+                  <button onclick="editBill('${bill.id}')" class="text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 font-semibold text-xs">
+                    Edytuj
+                  </button>
+                  <button onclick="deleteBillConfirm('${bill.id}')" class="text-slate-400 hover:text-red-600 dark:hover:text-red-400 text-xs">
+                    Usuń
+                  </button>
+                </div>
+              </div>
+            `;
+            mobileCards.appendChild(card);
+          }
         });
       }
 
@@ -1316,21 +1399,21 @@
       const blankSlots = monthInfo.startDayOfWeek - 1;
       for (let i = 0; i < blankSlots; i++) {
         const blank = document.createElement('div');
-        blank.className = 'min-h-[85px] sm:min-h-[105px] bg-slate-50/50 rounded-xl border border-slate-100/80 p-2';
+        blank.className = 'min-h-[50px] sm:min-h-[90px] bg-slate-50/50 dark:bg-slate-800/30 rounded-lg sm:rounded-xl border border-slate-100/60 dark:border-slate-800/40 p-1 sm:p-2';
         grid.appendChild(blank);
       }
 
       for (let day = 1; day <= monthInfo.days; day++) {
         const dayBills = dayMap[day] || [];
         const cell = document.createElement('div');
-        cell.className = 'min-h-[85px] sm:min-h-[105px] bg-white rounded-xl border border-slate-200 p-2 hover:shadow-xs transition flex flex-col justify-between';
+        cell.className = 'min-h-[50px] sm:min-h-[90px] bg-white dark:bg-slate-900 rounded-lg sm:rounded-xl border border-slate-200 dark:border-slate-800 p-1 sm:p-2 flex flex-col justify-between';
 
         let innerContent = `
-          <div class="flex items-center justify-between mb-1">
-            <span class="text-xs font-bold ${dayBills.length > 0 ? 'text-slate-900 bg-slate-100 px-1.5 py-0.5 rounded-md' : 'text-slate-400'}">${day}</span>
-            ${dayBills.length > 0 ? `<span class="text-[10px] font-semibold text-slate-500">${dayBills.length}</span>` : ''}
+          <div class="flex items-center justify-between mb-0.5">
+            <span class="text-[10px] sm:text-xs font-bold ${dayBills.length > 0 ? 'text-slate-900 dark:text-white bg-slate-100 dark:bg-slate-800 px-1 py-0.2 rounded' : 'text-slate-400'}">${day}</span>
+            ${dayBills.length > 0 ? `<span class="text-[9px] font-semibold text-slate-500">${dayBills.length}</span>` : ''}
           </div>
-          <div class="space-y-1 overflow-y-auto max-h-[60px] sm:max-h-[75px]">
+          <div class="space-y-0.5 overflow-y-auto max-h-[35px] sm:max-h-[65px]">
         `;
 
         dayBills.forEach(b => {
@@ -1339,9 +1422,9 @@
           if (b.status === 'AUTOPAY') dotColor = 'bg-indigo-500';
 
           innerContent += `
-            <div onclick="editBill('${b.id}')" title="${escapeHTML(b.name)} - ${formatMoney(b.amount)}" class="cursor-pointer text-[10px] sm:text-[11px] font-medium text-slate-700 bg-slate-50 hover:bg-slate-100 border border-slate-200/80 rounded px-1.5 py-0.5 truncate flex items-center gap-1">
+            <div onclick="editBill('${b.id}')" title="${escapeHTML(b.name)} - ${formatMoney(b.amount)}" class="cursor-pointer text-[9px] sm:text-[11px] font-medium text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 rounded px-1 py-0.2 truncate flex items-center gap-1">
               <span class="w-1.5 h-1.5 rounded-full ${dotColor} shrink-0"></span>
-              <span class="truncate">${escapeHTML(b.name)}</span>
+              <span class="truncate hidden sm:inline">${escapeHTML(b.name)}</span>
             </div>
           `;
         });
@@ -1379,27 +1462,22 @@
         const isSelectedMonth = m.key === state.currentMonthKey;
 
         const tr = document.createElement('tr');
-        tr.className = `hover:bg-slate-50 transition ${isSelectedMonth ? 'bg-emerald-50/50 font-semibold' : ''}`;
+        tr.className = `hover:bg-slate-50 dark:hover:bg-slate-800/50 transition ${isSelectedMonth ? 'bg-emerald-50/50 dark:bg-emerald-950/30 font-semibold' : ''}`;
         tr.innerHTML = `
-          <td class="py-3 px-4 font-bold text-slate-800 flex items-center gap-2">
+          <td class="py-2.5 px-3 font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
             ${isSelectedMonth ? '<span class="w-2 h-2 rounded-full bg-emerald-600"></span>' : ''}
             ${m.label}
           </td>
-          <td class="py-3 px-4 text-center text-slate-600">${count}</td>
-          <td class="py-3 px-4 text-right font-bold text-slate-900">${formatMoney(total)}</td>
-          <td class="py-3 px-4 text-right text-emerald-600 font-semibold">${formatMoney(paid)}</td>
-          <td class="py-3 px-4 text-right text-amber-600 font-semibold">${formatMoney(pending)}</td>
-          <td class="py-3 px-4 text-center">
-            <div class="flex items-center justify-center gap-2">
-              <div class="w-16 bg-slate-200 h-1.5 rounded-full overflow-hidden">
-                <div class="bg-emerald-500 h-full rounded-full" style="width: ${pct}%"></div>
-              </div>
-              <span class="text-xs text-slate-600 font-bold">${pct}%</span>
-            </div>
+          <td class="py-2.5 px-3 text-center text-slate-500 dark:text-slate-400">${count}</td>
+          <td class="py-2.5 px-3 text-right font-bold text-slate-900 dark:text-white">${formatMoney(total)}</td>
+          <td class="py-2.5 px-3 text-right text-emerald-600 dark:text-emerald-400 font-semibold">${formatMoney(paid)}</td>
+          <td class="py-2.5 px-3 text-right text-amber-600 dark:text-amber-400 font-semibold">${formatMoney(pending)}</td>
+          <td class="py-2.5 px-3 text-center">
+            <span class="text-xs font-bold text-slate-600 dark:text-slate-300">${pct}%</span>
           </td>
-          <td class="py-3 px-4 text-center">
-            <button onclick="setMonth('${m.key}'); switchTab('transactions');" class="text-xs font-semibold px-2.5 py-1 bg-white hover:bg-slate-100 border border-slate-300 rounded-lg transition">
-              Otwórz
+          <td class="py-2.5 px-3 text-center">
+            <button onclick="setMonth('${m.key}'); switchTab('transactions');" class="text-xs font-semibold px-2 py-0.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700 rounded transition">
+              Wybierz
             </button>
           </td>
         `;
@@ -1408,13 +1486,13 @@
 
       const yearPct = totalYearSum > 0 ? Math.round((totalYearPaid / totalYearSum) * 100) : 0;
       tfoot.innerHTML = `
-        <td class="py-3 px-4">RAZEM (13 MIESIĘCY)</td>
-        <td class="py-3 px-4 text-center">${totalYearBillsCount}</td>
-        <td class="py-3 px-4 text-right text-base font-extrabold text-slate-900">${formatMoney(totalYearSum)}</td>
-        <td class="py-3 px-4 text-right text-emerald-700">${formatMoney(totalYearPaid)}</td>
-        <td class="py-3 px-4 text-right text-amber-700">${formatMoney(totalYearPending)}</td>
-        <td class="py-3 px-4 text-center">${yearPct}% zrealizowane</td>
-        <td class="py-3 px-4 text-center">-</td>
+        <td class="py-3 px-3">RAZEM (13 M-CY)</td>
+        <td class="py-3 px-3 text-center">${totalYearBillsCount}</td>
+        <td class="py-3 px-3 text-right font-extrabold text-slate-900 dark:text-white">${formatMoney(totalYearSum)}</td>
+        <td class="py-3 px-3 text-right text-emerald-600 dark:text-emerald-400">${formatMoney(totalYearPaid)}</td>
+        <td class="py-3 px-3 text-right text-amber-600 dark:text-amber-400">${formatMoney(totalYearPending)}</td>
+        <td class="py-3 px-3 text-center">${yearPct}%</td>
+        <td class="py-3 px-3 text-center">-</td>
       `;
     }
 
@@ -1424,13 +1502,13 @@
         catContainer.innerHTML = '';
         state.categories.forEach(cat => {
           const item = document.createElement('div');
-          item.className = 'flex items-center justify-between p-2.5 rounded-xl border border-slate-200 bg-slate-50/50';
+          item.className = 'flex items-center justify-between p-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40';
           item.innerHTML = `
-            <div class="flex items-center gap-2 text-sm font-semibold text-slate-800">
+            <div class="flex items-center gap-2 text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-200">
               <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
               ${escapeHTML(cat.name)}
             </div>
-            <button onclick="deleteCategoryConfirm('${cat.id}')" class="text-slate-400 hover:text-red-600 p-1 transition" title="Usuń kategorię">
+            <button onclick="deleteCategoryConfirm('${cat.id}')" class="text-slate-400 hover:text-red-600 p-1 transition" title="Usuń">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
             </button>
           `;
@@ -1443,13 +1521,13 @@
         accContainer.innerHTML = '';
         state.accounts.forEach(acc => {
           const item = document.createElement('div');
-          item.className = 'flex items-center justify-between p-2.5 rounded-xl border border-slate-200 bg-slate-50/50';
+          item.className = 'flex items-center justify-between p-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40';
           item.innerHTML = `
-            <div class="flex items-center gap-2 text-sm font-semibold text-slate-800">
+            <div class="flex items-center gap-2 text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-200">
               <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
               ${escapeHTML(acc)}
             </div>
-            <button onclick="deleteAccountConfirm('${escapeHTML(acc)}')" class="text-slate-400 hover:text-red-600 p-1 transition" title="Usuń konto">
+            <button onclick="deleteAccountConfirm('${escapeHTML(acc)}')" class="text-slate-400 hover:text-red-600 p-1 transition" title="Usuń">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
             </button>
           `;
@@ -1467,7 +1545,6 @@
       if (!formCat || !filterCat) return;
       
       const currentFilterVal = filterCat.value;
-      
       formCat.innerHTML = '';
       filterCat.innerHTML = '<option value="ALL">Wszystkie kategorie</option>';
 
@@ -1545,7 +1622,7 @@
       const notes = document.getElementById('formBillNotes').value.trim();
 
       if (!name || isNaN(amount) || isNaN(day)) {
-        showToast('Wypełnij poprawnie wszystkie wymagane pola.', 'warning');
+        showToast('Wypełnij wymagane pola.', 'warning');
         return;
       }
 
@@ -1562,7 +1639,7 @@
             status,
             notes
           };
-          showToast('Płatność została zaktualizowana.', 'success');
+          showToast('Płatność zaktualizowana.', 'success');
         }
       } else {
         const newBill = {
@@ -1577,7 +1654,7 @@
           notes
         };
         state.bills.push(newBill);
-        showToast('Nowa płatność została dodana.', 'success');
+        showToast('Dodano płatność.', 'success');
       }
 
       saveState(true);
@@ -1591,10 +1668,10 @@
 
       if (bill.status === 'PAID') {
         bill.status = 'PENDING';
-        showToast(`Oznaczono "${bill.name}" jako do zapłaty.`, 'info');
+        showToast(`"${bill.name}" oznaczono jako do zapłaty.`, 'info');
       } else {
         bill.status = 'PAID';
-        showToast(`Oznaczono "${bill.name}" jako opłacone!`, 'success');
+        showToast(`"${bill.name}" opłacone! 🎉`, 'success');
       }
 
       saveState(true);
@@ -1607,12 +1684,12 @@
 
       showConfirmModal(
         'Usunąć płatność?',
-        `Czy na pewno chcesz usunąć "${bill.name}" (${formatMoney(bill.amount)})?`,
+        `Czy na pewno usunąć "${bill.name}" (${formatMoney(bill.amount)})?`,
         () => {
           state.bills = state.bills.filter(b => b.id !== billId);
           saveState(true);
           refreshUI();
-          showToast('Płatność została usunięta.', 'info');
+          showToast('Płatność usunięta.', 'info');
         }
       );
     }
@@ -1620,7 +1697,7 @@
     function copyCurrentMonthBillsToNext() {
       const currentIdx = MONTHS_CYCLE.findIndex(m => m.key === state.currentMonthKey);
       if (currentIdx === -1 || currentIdx >= MONTHS_CYCLE.length - 1) {
-        showToast('Nie można skopiować dalej – to ostatni miesiąc cyklu (Wrzesień 2027).', 'warning');
+        showToast('To ostatni miesiąc cyklu.', 'warning');
         return;
       }
 
@@ -1628,13 +1705,13 @@
       const currentMonthBills = state.bills.filter(b => b.monthKey === state.currentMonthKey);
 
       if (currentMonthBills.length === 0) {
-        showToast('Obecny miesiąc nie zawiera żadnych rachunków do skopiowania.', 'warning');
+        showToast('Brak rachunków do skopiowania.', 'warning');
         return;
       }
 
       showConfirmModal(
         'Kopiowanie rachunków',
-        `Czy skopiować ${currentMonthBills.length} pozycji do miesiąca: ${nextMonth.label}? Zostaną one utworzone ze statusem "Do zapłaty".`,
+        `Skopiować ${currentMonthBills.length} pozycji do miesiąca: ${nextMonth.label}?`,
         () => {
           currentMonthBills.forEach(b => {
             state.bills.push({
@@ -1651,7 +1728,7 @@
           });
 
           saveState(true);
-          showToast(`Pomyślnie skopiowano płatności do ${nextMonth.label}!`, 'success');
+          showToast(`Skopiowano do ${nextMonth.label}!`, 'success');
           setMonth(nextMonth.key);
         }
       );
@@ -1668,16 +1745,11 @@
         return;
       }
 
-      state.categories.push({
-        id: 'cat_' + Date.now(),
-        name,
-        color
-      });
-
+      state.categories.push({ id: 'cat_' + Date.now(), name, color });
       saveState(true);
       closeModal('addCategoryModal');
       renderCustomizeLists();
-      showToast(`Kategoria "${name}" została dodana.`, 'success');
+      showToast(`Dodano kategorię "${name}".`, 'success');
     }
 
     function deleteCategoryConfirm(catId) {
@@ -1686,12 +1758,12 @@
 
       showConfirmModal(
         'Usunąć kategorię?',
-        `Czy na pewno chcesz usunąć kategorię "${cat.name}"? Istniejące rachunki zachowają jej nazwę.`,
+        `Czy na pewno usunąć kategorię "${cat.name}"?`,
         () => {
           state.categories = state.categories.filter(c => c.id !== catId);
           saveState(true);
           renderCustomizeLists();
-          showToast('Kategoria została usunięta.', 'info');
+          showToast('Kategoria usunięta.', 'info');
         }
       );
     }
@@ -1702,7 +1774,7 @@
 
       if (!name) return;
       if (state.accounts.some(a => a.toLowerCase() === name.toLowerCase())) {
-        showToast('Taka metoda płatności już istnieje.', 'warning');
+        showToast('Taka metoda już istnieje.', 'warning');
         return;
       }
 
@@ -1710,18 +1782,18 @@
       saveState(true);
       closeModal('addAccountModal');
       renderCustomizeLists();
-      showToast(`Dodano metodę: "${name}".`, 'success');
+      showToast(`Dodano "${name}".`, 'success');
     }
 
     function deleteAccountConfirm(accName) {
       showConfirmModal(
-        'Usunąć metodę / konto?',
-        `Czy na pewno chcesz usunąć "${accName}"?`,
+        'Usunąć metodę?',
+        `Czy usunąć "${accName}"?`,
         () => {
           state.accounts = state.accounts.filter(a => a !== accName);
           saveState(true);
           renderCustomizeLists();
-          showToast('Metoda została usunięta.', 'info');
+          showToast('Metoda usunięta.', 'info');
         }
       );
     }
@@ -1730,13 +1802,13 @@
       state.currency = val.trim() || 'zł';
       saveState(true);
       refreshUI();
-      showToast(`Zaktualizowano walutę na "${state.currency}".`, 'success');
+      showToast(`Waluta: "${state.currency}".`, 'success');
     }
 
     function resetDefaultsConfirm() {
       showConfirmModal(
-        'Przywrócić ustawienia domyślne?',
-        'Przywróci to domyślne kategorie, konta oraz początkowe rachunki przykładowe.',
+        'Przywrócić domyślne?',
+        'Przywróci to domyślne kategorie, konta oraz początkowe rachunki.',
         () => {
           state.categories = [...DEFAULT_CATEGORIES];
           state.accounts = [...DEFAULT_ACCOUNTS];
@@ -1744,7 +1816,7 @@
           state.currency = 'zł';
           saveState(true);
           refreshUI();
-          showToast('Przywrócono domyślne wartości.', 'info');
+          showToast('Przywrócono domyślne.', 'info');
         }
       );
     }
@@ -1754,9 +1826,8 @@
       const currentBills = state.bills.filter(b => b.monthKey === state.currentMonthKey);
 
       let csv = 'Miesiac;Dzien;Nazwa Platnosci;Kategoria;Konto;Kwota;Waluta;Status;Notatki\n';
-
       currentBills.forEach(b => {
-        const row = [
+        csv += [
           monthObj.label,
           b.day,
           `"${b.name.replace(/"/g, '""')}"`,
@@ -1766,17 +1837,15 @@
           state.currency,
           b.status,
           `"${(b.notes || '').replace(/"/g, '""')}"`
-        ];
-        csv += row.join(';') + '\n';
+        ].join(';') + '\n';
       });
 
       downloadFile(csv, `Planner_Platnosci_${state.currentMonthKey}.csv`, 'text/csv;charset=utf-8;');
-      showToast(`Pobrano plik CSV dla: ${monthObj.label}`, 'success');
+      showToast(`Pobrano CSV dla: ${monthObj.label}`, 'success');
     }
 
     function exportYearlySummaryCSV() {
       let csv = 'Miesiac;Liczba_Pozycji;Suma_Calkowita;Oplacone;Do_Zaplaty;Waluta;Realizacja_Procent\n';
-
       MONTHS_CYCLE.forEach(m => {
         const monthBills = state.bills.filter(b => b.monthKey === m.key);
         const count = monthBills.length;
@@ -1797,7 +1866,7 @@
       });
 
       downloadFile(csv, 'Planner_Platnosci_Roczny_2026_2027.csv', 'text/csv;charset=utf-8;');
-      showToast('Pobrano roczny raport CSV!', 'success');
+      showToast('Pobrano roczny CSV!', 'success');
     }
 
     function downloadFile(content, fileName, mimeType) {
@@ -1839,9 +1908,7 @@
     const actionBtn = document.getElementById('confirmBtnAction');
     if (actionBtn) {
       actionBtn.onclick = () => {
-        if (typeof confirmCallback === 'function') {
-          confirmCallback();
-        }
+        if (typeof confirmCallback === 'function') confirmCallback();
         closeModal('confirmModal');
         confirmCallback = null;
       };
@@ -1853,20 +1920,20 @@
       const toast = document.createElement('div');
 
       let icon = '';
-      let borderClass = 'border-slate-200';
+      let borderClass = 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white';
       if (type === 'success') {
-        icon = '<svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>';
-        borderClass = 'border-emerald-200 bg-emerald-50 text-emerald-900';
+        icon = '<svg class="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>';
+        borderClass = 'border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-slate-900 text-emerald-900 dark:text-emerald-300';
       } else if (type === 'warning') {
-        icon = '<svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>';
-        borderClass = 'border-amber-200 bg-amber-50 text-amber-900';
+        icon = '<svg class="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>';
+        borderClass = 'border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-slate-900 text-amber-900 dark:text-amber-300';
       } else {
-        icon = '<svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>';
-        borderClass = 'border-blue-200 bg-blue-50 text-blue-900';
+        icon = '<svg class="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>';
+        borderClass = 'border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-slate-900 text-blue-900 dark:text-blue-300';
       }
 
-      toast.className = `pointer-events-auto flex items-center gap-2 px-3.5 py-2.5 rounded-xl shadow-lg border text-xs font-semibold ${borderClass} transition-all duration-300 transform translate-y-2 opacity-0`;
-      toast.innerHTML = `<span>${icon}</span> <span>${escapeHTML(message)}</span>`;
+      toast.className = `pointer-events-auto flex items-center gap-2 px-3 py-2.5 rounded-xl shadow-lg border text-xs font-semibold ${borderClass} transition-all duration-300 transform translate-y-2 opacity-0`;
+      toast.innerHTML = `<span>${icon}</span> <span class="truncate">${escapeHTML(message)}</span>`;
 
       container.appendChild(toast);
 
@@ -1877,7 +1944,7 @@
       setTimeout(() => {
         toast.classList.add('opacity-0', 'translate-y-2');
         setTimeout(() => toast.remove(), 300);
-      }, 3500);
+      }, 3000);
     }
 
     function refreshUI() {
@@ -1896,10 +1963,10 @@
       const manifestData = {
         name: "Planner Płatności 2026-2027",
         short_name: "Planner 26/27",
-        description: "Aplikacja do zarządzania płatnościami i rachunkami w cyklu Wrzesień 2026 - Wrzesień 2027",
+        description: "Zarządzaj płatnościami w cyklu Wrzesień 2026 - Wrzesień 2027",
         start_url: window.location.href,
         display: "standalone",
-        background_color: "#f8fafc",
+        background_color: "#0f172a",
         theme_color: "#059669",
         icons: [
           {
@@ -1918,7 +1985,6 @@
 
       if ('serviceWorker' in navigator) {
         const swScript = `
-          const CACHE_NAME = 'planner-pwa-v1';
           self.addEventListener('install', (e) => self.skipWaiting());
           self.addEventListener('activate', (e) => e.waitUntil(clients.claim()));
           self.addEventListener('fetch', (e) => e.respondWith(fetch(e.request).catch(() => caches.match(e.request))));
@@ -1932,17 +1998,7 @@
         e.preventDefault();
         deferredPwaPrompt = e;
         const btn = document.getElementById('btnPwaInstall');
-        if (btn) {
-          btn.classList.remove('hidden');
-          btn.classList.add('animate-pulse');
-        }
-      });
-
-      window.addEventListener('appinstalled', () => {
-        deferredPwaPrompt = null;
-        showToast('Planner został pomyślnie zainstalowany jako aplikacja!', 'success');
-        const btn = document.getElementById('btnPwaInstall');
-        if (btn) btn.innerHTML = '<span>✓ Zainstalowano</span>';
+        if (btn) btn.classList.remove('hidden');
       });
     }
 
@@ -1951,22 +2007,17 @@
       const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
 
       if (isStandalone) {
-        showToast('Aplikacja jest już uruchomiona w trybie pełnoekranowym PWA.', 'info');
+        showToast('Aplikacja działa w trybie pełnoekranowym.', 'info');
         return;
       }
 
       if (deferredPwaPrompt) {
         deferredPwaPrompt.prompt();
-        deferredPwaPrompt.userChoice.then((choiceResult) => {
-          if (choiceResult.outcome === 'accepted') {
-            showToast('Rozpoczęto instalację plannera...', 'success');
-          }
-          deferredPwaPrompt = null;
-        });
+        deferredPwaPrompt.userChoice.then(() => { deferredPwaPrompt = null; });
       } else if (isIos) {
         openModal('pwaIosModal');
       } else {
-        showToast('Aby zainstalować: kliknij ikonę instalacji w pasku adresu przeglądarki (lub menu → "Zainstaluj")', 'info');
+        showToast('Kliknij ikonę instalacji w pasku przeglądarki.', 'info');
       }
     }
 
@@ -1994,6 +2045,7 @@
     window.copySyncLink = copySyncLink;
 
     function initApp() {
+      applyTheme(currentTheme);
       loadState();
       initMonthSelector();
       initPWA();
