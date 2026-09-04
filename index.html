@@ -685,37 +685,54 @@
       const currentMonth = today.getMonth() + 1;
       const currentDay = today.getDate();
 
+      // Flaga czy wyświetlany miesiąc jest bieżącym (lub z przeszłości)
+      // Do sprawdzania przeterminowań
+      const isPastOrCurrentMonth = (year < currentYear) || (year === currentYear && month <= currentMonth);
+
       for(let i=1; i<startDay; i++) { grid.innerHTML += `<div class="p-2 sm:p-4 rounded-2xl"></div>`; }
       
       for(let i=1; i<=daysInMonth; i++) {
          const dayBills = curr.filter(b => b.day === i);
          let dots = '';
          
-         dayBills.forEach(b => { 
-           // NIEOPŁACONE = Czerwona kropka, OPŁACONE = Zielona kropka
-           dots += `<div class="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full ${b.status === 'PAID' ? 'bg-emerald-500' : 'bg-red-500'} shadow-sm" title="${b.name}"></div>`; 
-         });
-         
          const hasPending = dayBills.some(b => b.status === 'PENDING');
          const isToday = (year === currentYear && month === currentMonth && i === currentDay);
          
-         // Wyraźne podświetlenie tła dla nieopłaconych (czerwonawe)
-         let tileBg = hasPending 
-            ? 'border-red-200 bg-red-50 dark:border-red-900/40 dark:bg-red-950' 
-            : 'border-slate-100 bg-white dark:border-slate-800/80 dark:bg-slate-900';
-         
-         // Jeśli dzisiaj, daj mocną ramkę
-         if (isToday) {
-             tileBg += ' ring-2 ring-indigo-500 dark:ring-indigo-500 shadow-md transform scale-105 z-10';
+         // Sprawdzenie czy dzień jest w przeszłości (przeterminowany)
+         let isOverdue = false;
+         if (hasPending) {
+             if (year < currentYear) isOverdue = true;
+             else if (year === currentYear && month < currentMonth) isOverdue = true;
+             else if (year === currentYear && month === currentMonth && i < currentDay) isOverdue = true;
          }
 
-         // Styl numeru: jeśli dzisiaj, jest w granatowym kółku
-         let textStyle = hasPending 
-            ? 'text-red-700 dark:text-red-500' 
-            : 'text-slate-700 dark:text-slate-300';
+         dayBills.forEach(b => { 
+           // Jeśli przeterminowany = czerwona mrugająca, jeśli po prostu do zapłaty = czerwona, zapłacony = zielona
+           let dotClass = 'bg-red-500'; // Domyślnie czerwona
+           if (b.status === 'PAID') dotClass = 'bg-emerald-500';
+           else if (isOverdue) dotClass = 'bg-red-500 animate-pulse ring-2 ring-red-500/50';
+
+           dots += `<div class="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full ${dotClass} shadow-sm" title="${b.name}"></div>`; 
+         });
+         
+         // Styl tła kafelka
+         let tileBg = 'border-slate-100 bg-white dark:border-slate-800/80 dark:bg-slate-900';
+         
+         if (isToday) {
+             tileBg += ' ring-2 ring-indigo-500 dark:ring-indigo-500 shadow-md transform scale-105 z-10';
+         } else if (isOverdue) {
+             // Zamiast całego czerwonego tła, dajemy subtelną czerwoną ramkę
+             tileBg = 'border-red-500/50 bg-red-50/30 dark:border-red-500/50 dark:bg-red-950/20 ring-1 ring-red-500/30';
+         }
+
+         let textStyle = 'text-slate-700 dark:text-slate-300';
          
          if (isToday) {
              textStyle = 'bg-indigo-600 dark:bg-indigo-600 text-white rounded-full w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center';
+         } else if (isOverdue) {
+             textStyle = 'text-red-600 dark:text-red-400 font-black'; // Wyraźniejszy czerwony tekst dla przeterminowanych
+         } else if (hasPending) {
+             textStyle = 'text-slate-900 dark:text-white font-black'; // Przyszłe rachunki do zapłaty na biało/czarno (zależnie od trybu)
          }
 
          grid.innerHTML += `
