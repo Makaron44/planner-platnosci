@@ -1,0 +1,2009 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Planner Płatności | Wrzesień 2026 - Wrzesień 2027</title>
+  
+  <!-- PWA & Mobile Web App Meta Tags -->
+  <meta name="theme-color" content="#059669" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Planner 26/27" />
+  <meta name="application-name" content="Planner Płatności" />
+  <meta name="description" content="Prywatny planner płatności i rachunków domowych na cykl Wrzesień 2026 – Wrzesień 2027." />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='24' fill='%23059669'/%3E%3Cpath d='M30 45 L45 60 L70 35' fill='none' stroke='white' stroke-width='10' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
+  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='24' fill='%23059669'/%3E%3Cpath d='M30 45 L45 60 L70 35' fill='none' stroke='white' stroke-width='10' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
+  <link id="manifest-placeholder" rel="manifest" />
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#f0fdf4',
+              100: '#dcfce7',
+              500: '#22c55e',
+              600: '#16a34a',
+              700: '#15803d',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.04);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(100, 116, 139, 0.25);
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(100, 116, 139, 0.45);
+    }
+    .badge-pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.2rem 0.65rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      border-radius: 9999px;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col font-sans selection:bg-emerald-100 selection:text-emerald-900">
+
+  <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16 sm:h-20 gap-4">
+        
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 flex items-center justify-center text-white shadow-md shadow-emerald-500/20">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h1 class="text-lg sm:text-xl font-bold text-slate-900 leading-tight">Planner Płatności</h1>
+              <span class="bg-emerald-100 text-emerald-800 text-[11px] font-bold px-2 py-0.5 rounded-full border border-emerald-200 uppercase tracking-wider">2026 - 2027</span>
+            </div>
+            <p class="text-xs text-slate-500 hidden sm:block">Zarządzaj rachunkami, terminami i budżetem domowym</p>
+          </div>
+        </div>
+
+        <!-- Month Navigation Controls -->
+        <div class="flex items-center gap-2 bg-slate-100 p-1.5 rounded-xl border border-slate-200">
+          <button id="btnPrevMonth" title="Poprzedni miesiąc" class="p-1.5 text-slate-600 hover:text-slate-900 hover:bg-white rounded-lg transition">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+          </button>
+          
+          <select id="selectCurrentMonth" class="bg-white border-0 text-slate-800 font-semibold text-sm rounded-lg py-1 px-3 shadow-xs focus:ring-2 focus:ring-emerald-500 cursor-pointer">
+          </select>
+
+          <button id="btnNextMonth" title="Następny miesiąc" class="p-1.5 text-slate-600 hover:text-slate-900 hover:bg-white rounded-lg transition">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+          </button>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <!-- Install PWA Button (Hidden by default, shown when installable or clicked) -->
+          <button id="btnPwaInstall" onclick="handlePwaInstallClick()" class="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200 rounded-xl hover:bg-emerald-100 transition shadow-xs" title="Zainstaluj planner jako aplikację na telefonie lub komputerze">
+            <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+            <span class="hidden sm:inline">Zainstaluj PWA</span>
+            <span class="sm:hidden">Zainstaluj</span>
+          </button>
+
+          <!-- Przycisk Synchronizacji w Chmurze -->
+          <button id="btnOpenSync" onclick="openModal('syncModal')" class="inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold text-emerald-900 bg-emerald-100/80 hover:bg-emerald-200/80 border border-emerald-300 rounded-xl transition shadow-xs cursor-pointer" title="Synchronizacja w chmurze (Telefon ⇄ Komputer)">
+            <span id="cloudStatusDot" class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+            <svg class="w-4 h-4 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 00-9.78 2.096A4.001 4.001 0 003 15z"/>
+            </svg>
+            <span id="cloudStatusLabel" class="font-bold">Chmura: Aktywna</span>
+          </button>
+
+          <div class="hidden lg:flex items-center gap-2">
+            <button onclick="exportPlannerCSV()" class="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-slate-700 bg-white border border-slate-300 rounded-xl hover:bg-slate-50 transition shadow-xs">
+              <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+              Eksportuj CSV
+            </button>
+            <button onclick="openModal('addBillModal')" class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl transition shadow-sm shadow-emerald-600/30">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+              Nowa Płatność
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <div class="bg-white border-b border-slate-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <nav class="flex space-x-6 overflow-x-auto py-2.5" aria-label="Tabs">
+        <button onclick="switchTab('dashboard')" id="tab-dashboard" class="tab-btn inline-flex items-center gap-2 py-1.5 px-3 text-sm font-semibold border-b-2 border-emerald-600 text-emerald-700 transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+          Start Here & Pulpit
+        </button>
+        <button onclick="switchTab('transactions')" id="tab-transactions" class="tab-btn inline-flex items-center gap-2 py-1.5 px-3 text-sm font-medium text-slate-500 hover:text-slate-900 border-b-2 border-transparent transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
+          Miesięczne Płatności
+          <span id="tabCountBadge" class="bg-slate-100 text-slate-600 text-xs px-2 py-0.5 rounded-full font-bold">0</span>
+        </button>
+        <button onclick="switchTab('calendar')" id="tab-calendar" class="tab-btn inline-flex items-center gap-2 py-1.5 px-3 text-sm font-medium text-slate-500 hover:text-slate-900 border-b-2 border-transparent transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          Widok Kalendarza
+        </button>
+        <button onclick="switchTab('yearly')" id="tab-yearly" class="tab-btn inline-flex items-center gap-2 py-1.5 px-3 text-sm font-medium text-slate-500 hover:text-slate-900 border-b-2 border-transparent transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+          Roczne Zestawienie
+        </button>
+        <button onclick="switchTab('customize')" id="tab-customize" class="tab-btn inline-flex items-center gap-2 py-1.5 px-3 text-sm font-medium text-slate-500 hover:text-slate-900 border-b-2 border-transparent transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+          Customize Here (Kategorie i Konta)
+        </button>
+      </nav>
+    </div>
+  </div>
+
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      
+      <!-- Total Bills -->
+      <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs relative overflow-hidden">
+        <div class="flex items-center justify-between text-slate-500 mb-2">
+          <span class="text-xs font-semibold uppercase tracking-wider">Razem do zapłaty</span>
+          <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+          </div>
+        </div>
+        <div class="text-2xl font-bold text-slate-900" id="kpiTotal">0,00 zł</div>
+        <p class="text-xs text-slate-500 mt-1" id="kpiTotalSub">Liczba pozycji: 0</p>
+      </div>
+
+      <!-- Paid Bills -->
+      <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs relative overflow-hidden">
+        <div class="flex items-center justify-between text-slate-500 mb-2">
+          <span class="text-xs font-semibold uppercase tracking-wider">Już Opłacone</span>
+          <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+          </div>
+        </div>
+        <div class="text-2xl font-bold text-emerald-600" id="kpiPaid">0,00 zł</div>
+        <div class="w-full bg-slate-100 h-1.5 rounded-full mt-2 overflow-hidden">
+          <div id="kpiProgressBar" class="bg-emerald-500 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+        </div>
+        <p class="text-xs text-slate-500 mt-1 flex justify-between" id="kpiPaidSub">
+          <span>0 opłaconych</span>
+          <span id="kpiPercentText">0%</span>
+        </p>
+      </div>
+
+      <!-- Pending / Remaining -->
+      <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs relative overflow-hidden">
+        <div class="flex items-center justify-between text-slate-500 mb-2">
+          <span class="text-xs font-semibold uppercase tracking-wider">Pozostało do zapłaty</span>
+          <div class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </div>
+        </div>
+        <div class="text-2xl font-bold text-amber-600" id="kpiRemaining">0,00 zł</div>
+        <p class="text-xs text-slate-500 mt-1" id="kpiRemainingSub">0 płatności oczekujących</p>
+      </div>
+
+      <!-- Overdue or Next Due Date -->
+      <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs relative overflow-hidden">
+        <div class="flex items-center justify-between text-slate-500 mb-2">
+          <span class="text-xs font-semibold uppercase tracking-wider">Status & Pilne</span>
+          <div class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </div>
+        </div>
+        <div class="text-base font-bold text-slate-800" id="kpiNextDue">Brak pilnych</div>
+        <p class="text-xs text-slate-500 mt-1" id="kpiNextDueSub">Wszystko pod kontrolą</p>
+      </div>
+
+    </div>
+
+    <section id="section-dashboard" class="space-y-6">
+      
+      <div class="bg-gradient-to-r from-slate-900 via-slate-800 to-emerald-950 text-white rounded-2xl p-6 sm:p-8 shadow-lg relative overflow-hidden">
+        <div class="relative z-10 max-w-3xl">
+          <span class="px-3 py-1 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 rounded-full text-xs font-semibold tracking-wide uppercase">
+            Start Here • Instrukcja & Przegląd
+          </span>
+          <h2 class="text-2xl sm:text-3xl font-extrabold mt-3 tracking-tight">
+            Witaj w Twoim Plannerze Płatności (2026 / 2027)
+          </h2>
+          <p class="text-slate-300 text-sm sm:text-base mt-2 leading-relaxed">
+            Ten planner obejmuje pełen cykl rozliczeniowy od <strong>Września 2026</strong> do <strong>Września 2027</strong>. 
+            Możesz dodawać rachunki, ustalać terminy płatności, śledzić stan opłacenia jednym kliknięciem oraz dostosowywać kategorie w zakładce <em>Customize Here</em>.
+          </p>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6">
+            <div class="bg-white/10 backdrop-blur-xs p-3.5 rounded-xl border border-white/10">
+              <span class="text-emerald-400 font-bold block text-sm mb-1">1. Wybierz Miesiąc</span>
+              <p class="text-xs text-slate-300">Skorzystaj z selektora w nagłówku, aby płynnie przełączać się między miesiącami cyklu 2026–2027.</p>
+            </div>
+            <div class="bg-white/10 backdrop-blur-xs p-3.5 rounded-xl border border-white/10">
+              <span class="text-emerald-400 font-bold block text-sm mb-1">2. Dodawaj Rachunki</span>
+              <p class="text-xs text-slate-300">Wprowadź czynsz, kredyt, media i subskrypcje. Oznaczaj jednym kliknięciem jako "Opłacone".</p>
+            </div>
+            <div class="bg-white/10 backdrop-blur-xs p-3.5 rounded-xl border border-white/10">
+              <span class="text-emerald-400 font-bold block text-sm mb-1">3. Kopiuj Cykliczne</span>
+              <p class="text-xs text-slate-300">Wygodny przycisk pozwala skopiować stałe opłaty do kolejnego miesiąca bez ponownego wpisywania.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs lg:col-span-2">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+              Struktura wydatków wg kategorii (<span id="dashMonthLabel">Wrzesień 2026</span>)
+            </h3>
+            <button onclick="switchTab('customize')" class="text-xs font-semibold text-emerald-600 hover:text-emerald-700">Edytuj kategorie &rarr;</button>
+          </div>
+          <div id="categoryBreakdownContainer" class="space-y-3"></div>
+        </div>
+
+        <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs">
+          <h3 class="text-base font-bold text-slate-900 mb-4 flex items-center gap-2">
+            <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            Najbliższe płatności
+          </h3>
+          <div id="dashUpcomingContainer" class="space-y-3"></div>
+        </div>
+
+      </div>
+
+    </section>
+
+    <section id="section-transactions" class="hidden space-y-4">
+      
+      <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-wrap items-center justify-between gap-3">
+        <div class="flex flex-wrap items-center gap-2">
+          
+          <div class="relative">
+            <input type="text" id="billSearch" placeholder="Szukaj płatności..." oninput="renderTransactionsTable()" class="pl-9 pr-3 py-2 text-xs sm:text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-hidden w-48 sm:w-64 bg-slate-50 focus:bg-white" />
+            <svg class="w-4 h-4 text-slate-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+          </div>
+
+          <select id="filterStatus" onchange="renderTransactionsTable()" class="text-xs sm:text-sm border border-slate-300 rounded-xl px-3 py-2 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-emerald-500">
+            <option value="ALL">Wszystkie statusy</option>
+            <option value="PENDING">Tylko do zapłaty</option>
+            <option value="PAID">Tylko opłacone</option>
+            <option value="AUTOPAY">Autopłatność</option>
+          </select>
+
+          <select id="filterCategory" onchange="renderTransactionsTable()" class="text-xs sm:text-sm border border-slate-300 rounded-xl px-3 py-2 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-emerald-500">
+            <option value="ALL">Wszystkie kategorie</option>
+          </select>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button onclick="copyCurrentMonthBillsToNext()" class="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded-xl transition" title="Kopiuj obecne płatności do kolejnego miesiąca jako nowe wzorce">
+            <svg class="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"/></svg>
+            Kopiuj na kolejny miesiąc
+          </button>
+
+          <button onclick="openModal('addBillModal')" class="inline-flex items-center gap-1.5 px-4 py-2 text-xs sm:text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl transition shadow-xs">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+            Dodaj Płatność
+          </button>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse text-sm">
+            <thead>
+              <tr class="bg-slate-50 border-b border-slate-200 text-slate-600 font-semibold text-xs uppercase tracking-wider">
+                <th class="py-3 px-4 w-12 text-center">Status</th>
+                <th class="py-3 px-4">Nazwa Płatności / Odbiorca</th>
+                <th class="py-3 px-4">Kategoria</th>
+                <th class="py-3 px-4">Termin</th>
+                <th class="py-3 px-4">Konto / Metoda</th>
+                <th class="py-3 px-4 text-right">Kwota</th>
+                <th class="py-3 px-4">Notatki</th>
+                <th class="py-3 px-4 text-center w-24">Akcje</th>
+              </tr>
+            </thead>
+            <tbody id="billsTableBody" class="divide-y divide-slate-100 text-slate-800 font-medium">
+            </tbody>
+          </table>
+        </div>
+
+        <div id="tableEmptyState" class="hidden text-center py-12 px-4">
+          <div class="w-12 h-12 rounded-full bg-slate-100 text-slate-400 mx-auto flex items-center justify-center mb-3">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          </div>
+          <h4 class="text-base font-semibold text-slate-700">Brak zarejestrowanych płatności</h4>
+          <p class="text-xs text-slate-500 mt-1 max-w-sm mx-auto">W tym miesiącu nie dodano jeszcze żadnych rachunków lub żaden nie spełnia filtrów.</p>
+          <button onclick="openModal('addBillModal')" class="mt-4 inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-lg transition">
+            + Dodaj pierwszą płatność
+          </button>
+        </div>
+
+        <div class="bg-slate-50 border-t border-slate-200 p-4 flex flex-wrap items-center justify-between gap-4 text-xs font-semibold text-slate-600">
+          <div id="tableFooterCounts">Pozycji: 0 | Opłaconych: 0</div>
+          <div class="flex items-center gap-4 text-sm">
+            <span>Opłacone: <span id="tableFooterPaid" class="text-emerald-700 font-bold">0,00 zł</span></span>
+            <span>Do zapłaty: <span id="tableFooterPending" class="text-amber-700 font-bold">0,00 zł</span></span>
+            <span class="text-slate-900 border-l border-slate-300 pl-4">Suma: <span id="tableFooterSum" class="font-bold">0,00 zł</span></span>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+    <section id="section-calendar" class="hidden space-y-4">
+      <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs">
+        <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+          <div>
+            <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+              <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+              Kalendarz terminów płatności (<span id="calHeaderMonth">Wrzesień 2026</span>)
+            </h3>
+            <p class="text-xs text-slate-500">Rozkład dni płatności w miesiącu, aby uniknąć kumulacji i opóźnień.</p>
+          </div>
+          <div class="flex items-center gap-3 text-xs">
+            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm bg-emerald-500 inline-block"></span> Opłacone</span>
+            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm bg-amber-500 inline-block"></span> Do zapłaty</span>
+            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm bg-indigo-500 inline-block"></span> Autopłatność</span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-7 gap-1.5 sm:gap-2 mb-2 text-center text-xs font-bold text-slate-500 uppercase">
+          <div>Pn</div>
+          <div>Wt</div>
+          <div>Śr</div>
+          <div>Cz</div>
+          <div>Pt</div>
+          <div class="text-emerald-700">So</div>
+          <div class="text-emerald-700">Nd</div>
+        </div>
+
+        <div id="calendarGrid" class="grid grid-cols-7 gap-1.5 sm:gap-2"></div>
+      </div>
+    </section>
+
+    <section id="section-yearly" class="hidden space-y-4">
+      <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h3 class="text-lg font-bold text-slate-900">Roczne zestawienie płatności (09.2026 - 09.2027)</h3>
+            <p class="text-xs text-slate-500">Zbiorczy rzut oka na wszystkie 13 miesięcy z sumami i wskaźnikami realizacji.</p>
+          </div>
+          <button onclick="exportYearlySummaryCSV()" class="text-xs font-semibold px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition border border-slate-300">
+            Pobierz Raport Roczny CSV
+          </button>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse text-sm">
+            <thead>
+              <tr class="bg-slate-50 border-b border-slate-200 text-slate-600 font-semibold text-xs uppercase tracking-wider">
+                <th class="py-3 px-4">Miesiąc</th>
+                <th class="py-3 px-4 text-center">Liczba rachunków</th>
+                <th class="py-3 px-4 text-right">Razem kwota</th>
+                <th class="py-3 px-4 text-right">Opłacone</th>
+                <th class="py-3 px-4 text-right">Do zapłaty</th>
+                <th class="py-3 px-4 text-center">Stopień realizacji</th>
+                <th class="py-3 px-4 text-center">Przejdź</th>
+              </tr>
+            </thead>
+            <tbody id="yearlySummaryTableBody" class="divide-y divide-slate-100"></tbody>
+            <tfoot class="bg-slate-50 font-bold border-t-2 border-slate-300 text-slate-900">
+              <tr id="yearlySummaryFooter"></tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="section-customize" class="hidden space-y-6">
+      
+      <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h3 class="text-lg font-bold text-slate-900">Customize Here • Personalizacja Kategorii & Kont</h3>
+            <p class="text-xs text-slate-500">Zarządzaj nazwami kategorii, kolorami oraz formami płatności / kontami bankowymi.</p>
+          </div>
+          <button onclick="resetDefaultsConfirm()" class="text-xs font-medium text-red-600 hover:text-red-700 underline">
+            Przywróć domyślne ustawienia
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-6">
+          
+          <div class="space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+              <h4 class="font-bold text-sm text-slate-800 flex items-center gap-2">
+                <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
+                Kategorie Wydatków
+              </h4>
+              <button onclick="openModal('addCategoryModal')" class="text-xs font-semibold px-2.5 py-1 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 rounded-lg">
+                + Dodaj kategorię
+              </button>
+            </div>
+            
+            <div id="categoriesList" class="space-y-2"></div>
+          </div>
+
+          <div class="space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+              <h4 class="font-bold text-sm text-slate-800 flex items-center gap-2">
+                <span class="w-3 h-3 rounded-full bg-blue-500"></span>
+                Konta i Metody Płatności
+              </h4>
+              <button onclick="openModal('addAccountModal')" class="text-xs font-semibold px-2.5 py-1 bg-blue-50 text-blue-700 hover:bg-blue-100 rounded-lg">
+                + Dodaj metodę / konto
+              </button>
+            </div>
+
+            <div id="accountsList" class="space-y-2"></div>
+
+            <div class="mt-6 pt-4 border-t border-slate-200">
+              <h5 class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Waluta i Format</h5>
+              <div class="flex items-center gap-3">
+                <label class="text-xs text-slate-600">Domyślna waluta:</label>
+                <input type="text" id="currencySymbolInput" value="zł" class="w-20 px-2 py-1 text-sm border border-slate-300 rounded-lg font-bold" onchange="updateCurrency(this.value)" />
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <div id="addBillModal" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 relative animate-in fade-in zoom-in duration-200">
+      
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
+        <h3 id="billModalTitle" class="text-base font-bold text-slate-900">Dodaj Nową Płatność</h3>
+        <button onclick="closeModal('addBillModal')" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <form id="billForm" onsubmit="handleBillSubmit(event)" class="space-y-3">
+        <input type="hidden" id="formBillId" value="" />
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Nazwa płatności / Odbiorca *</label>
+          <input type="text" id="formBillName" placeholder="np. Czynsz za mieszkanie, Tauron, Netflix" required class="w-full px-3 py-2 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-hidden" />
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Kwota (zł) *</label>
+            <input type="number" step="0.01" min="0" id="formBillAmount" placeholder="0.00" required class="w-full px-3 py-2 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-hidden font-semibold" />
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Dzień płatności (1-31) *</label>
+            <input type="number" min="1" max="31" id="formBillDay" placeholder="np. 10" required class="w-full px-3 py-2 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-hidden" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Kategoria</label>
+            <select id="formBillCategory" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-hidden bg-white">
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Metoda / Konto</label>
+            <select id="formBillAccount" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-hidden bg-white">
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Status płatności</label>
+          <select id="formBillStatus" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-hidden bg-white">
+            <option value="PENDING">Oczekuje (Do zapłaty)</option>
+            <option value="PAID">Opłacone</option>
+            <option value="AUTOPAY">Autopłatność (Polecenie zapłaty)</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Dodatkowe notatki (opcjonalnie)</label>
+          <input type="text" id="formBillNotes" placeholder="np. nr umowy, split z partnerem, faktura VAT" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-hidden" />
+        </div>
+
+        <div class="pt-3 flex items-center justify-end gap-2 border-t border-slate-100">
+          <button type="button" onclick="closeModal('addBillModal')" class="px-4 py-2 text-xs sm:text-sm font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition">
+            Anuluj
+          </button>
+          <button type="submit" class="px-5 py-2 text-xs sm:text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl transition shadow-xs">
+            Zapisz Płatność
+          </button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+
+  <div id="addCategoryModal" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-slate-200">
+      <h3 class="text-base font-bold text-slate-900 mb-3">Dodaj Nową Kategorię</h3>
+      <form onsubmit="handleCategorySubmit(event)" class="space-y-3">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Nazwa Kategorii</label>
+          <input type="text" id="formCategoryName" placeholder="np. Zwierzęta, Zdrowie, Oszczędności" required class="w-full px-3 py-2 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-hidden" />
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Kolor etykiety</label>
+          <select id="formCategoryColor" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 bg-white">
+            <option value="emerald">Zielony (Szmaragdowy)</option>
+            <option value="blue">Niebieski</option>
+            <option value="indigo">Fioletowy / Indygo</option>
+            <option value="amber">Żółty / Bursztynowy</option>
+            <option value="rose">Różowy / Czerwony</option>
+            <option value="cyan">Błękitny / Cyjan</option>
+            <option value="slate">Szary / Neutralny</option>
+          </select>
+        </div>
+        <div class="flex items-center justify-end gap-2 pt-2">
+          <button type="button" onclick="closeModal('addCategoryModal')" class="px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-lg">Anuluj</button>
+          <button type="submit" class="px-4 py-1.5 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg">Zapisz</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="addAccountModal" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-slate-200">
+      <h3 class="text-base font-bold text-slate-900 mb-3">Dodaj Konto / Metodę Płatności</h3>
+      <form onsubmit="handleAccountSubmit(event)" class="space-y-3">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Nazwa konta lub metody</label>
+          <input type="text" id="formAccountName" placeholder="np. mBank Konto, Karta Santander, BLIK" required class="w-full px-3 py-2 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-hidden" />
+        </div>
+        <div class="flex items-center justify-end gap-2 pt-2">
+          <button type="button" onclick="closeModal('addAccountModal')" class="px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-lg">Anuluj</button>
+          <button type="submit" class="px-4 py-1.5 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg">Zapisz</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="confirmModal" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl border border-slate-200 text-center">
+      <div class="w-11 h-11 rounded-full bg-red-50 text-red-600 mx-auto flex items-center justify-center mb-3">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+      </div>
+      <h4 id="confirmModalTitle" class="text-base font-bold text-slate-900 mb-1">Czy na pewno?</h4>
+      <p id="confirmModalMessage" class="text-xs text-slate-500 mb-5">Ta operacja nie może zostać cofnięta.</p>
+      <div class="flex items-center justify-center gap-3">
+        <button id="confirmBtnCancel" class="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition">Anuluj</button>
+        <button id="confirmBtnAction" class="px-4 py-2 text-xs font-semibold text-white bg-red-600 hover:bg-red-700 rounded-xl transition">Potwierdź</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="pwaIosModal" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-slate-200">
+      <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto mb-3">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+      </div>
+      <h3 class="text-base font-bold text-slate-900 text-center mb-1">Zainstaluj na iPhone / iPad</h3>
+      <p class="text-xs text-slate-600 text-center mb-4">Aby dodać planner do ekranu głównego telefonu jako osobną aplikację:</p>
+      <ol class="space-y-2 text-xs text-slate-700 bg-slate-50 p-3 rounded-xl border border-slate-200/80 mb-5">
+        <li class="flex items-start gap-2">
+          <span class="font-bold text-emerald-600">1.</span>
+          <span>Kliknij przycisk <strong>Udostępnij</strong> (ikona kwadratu ze strzałką w górę) na dolnym pasku przeglądarki Safari.</span>
+        </li>
+        <li class="flex items-start gap-2">
+          <span class="font-bold text-emerald-600">2.</span>
+          <span>Przewiń w dół i wybierz opcję <strong>Do ekranu początkowego</strong> (Add to Home Screen).</span>
+        </li>
+        <li class="flex items-start gap-2">
+          <span class="font-bold text-emerald-600">3.</span>
+          <span>Kliknij <strong>Dodaj</strong> w prawym górnym rogu.</span>
+        </li>
+      </ol>
+      <button onclick="closeModal('pwaIosModal')" class="w-full py-2.5 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl transition">
+        Rozumiem
+      </button>
+    </div>
+  </div>
+
+  <!-- Modal Synchronizacji w Chmurze -->
+  <div id="syncModal" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 relative">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 00-9.78 2.096A4.001 4.001 0 003 15z"/></svg>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-slate-900">Synchronizacja Telefon ⇄ Komputer</h3>
+            <p id="syncModalStatus" class="text-xs text-emerald-700 font-semibold">Połączono z bezpłatną chmurą</p>
+          </div>
+        </div>
+        <button onclick="closeModal('syncModal')" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <div class="space-y-4 text-xs text-slate-600">
+        <p class="leading-relaxed">
+          Wszystkie Twoje płatności, kwoty i odznaczone rachunki zapisują się automatycznie. Aby mieć dokładnie te same dane na telefonie i komputerze, używaj <strong>tego samego Kodu Profilu</strong> na obu urządzeniach.
+        </p>
+
+        <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+          <label class="block font-bold text-slate-700 text-xs uppercase tracking-wider">Twój Kod Profilu:</label>
+          <div class="flex items-center gap-2">
+            <input type="text" id="inputSyncCode" class="w-full px-3 py-2 text-sm font-extrabold text-slate-900 bg-white border border-slate-300 rounded-lg uppercase tracking-wider text-center focus:ring-2 focus:ring-emerald-500 focus:outline-hidden" value="DOM-2026" />
+            <button onclick="applySyncCode()" class="px-3.5 py-2 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition whitespace-nowrap">
+              Zapisz / Połącz
+            </button>
+          </div>
+          <p class="text-[11px] text-slate-400">Możesz wpisać własny kod (np. <em>DOM-NOWAK</em>) lub wylosować nowy.</p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <button onclick="copySyncLink()" class="flex items-center justify-center gap-1.5 px-3 py-2.5 font-bold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-xl transition">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+            Kopiuj link do telefonu
+          </button>
+          <button onclick="generateRandomSyncCode()" class="flex items-center justify-center gap-1.5 px-3 py-2.5 font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded-xl transition">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+            Wylosuj nowy kod
+          </button>
+        </div>
+
+        <div class="border-t border-slate-100 pt-3 flex items-center justify-between text-[11px] text-slate-400">
+          <span id="syncTimeStatus">Ostatnia synchronizacja: W toku...</span>
+          <button onclick="closeModal('syncModal')" class="font-bold text-emerald-700 hover:underline">Zamknij</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="bg-white border-t border-slate-200 py-6 text-center text-xs text-slate-400 mt-auto">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-2">
+      <span>Planner Płatności • Zakres: Wrzesień 2026 – Wrzesień 2027</span>
+      <span>Wszystkie dane są zapisywane w chmurze w czasie rzeczywistym oraz lokalnie w przeglądarce.</span>
+    </div>
+  </footer>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    const MONTHS_CYCLE = [
+      { key: "2026-09", label: "Wrzesień 2026", days: 30, startDayOfWeek: 2 },
+      { key: "2026-10", label: "Październik 2026", days: 31, startDayOfWeek: 4 },
+      { key: "2026-11", label: "Listopad 2026", days: 30, startDayOfWeek: 7 },
+      { key: "2026-12", label: "Grudzień 2026", days: 31, startDayOfWeek: 2 },
+      { key: "2027-01", label: "Styczeń 2027", days: 31, startDayOfWeek: 5 },
+      { key: "2027-02", label: "Luty 2027", days: 28, startDayOfWeek: 1 },
+      { key: "2027-03", label: "Marzec 2027", days: 31, startDayOfWeek: 1 },
+      { key: "2027-04", label: "Kwiecień 2027", days: 30, startDayOfWeek: 4 },
+      { key: "2027-05", label: "Maj 2027", days: 31, startDayOfWeek: 6 },
+      { key: "2027-06", label: "Czerwiec 2027", days: 30, startDayOfWeek: 2 },
+      { key: "2027-07", label: "Lipiec 2027", days: 31, startDayOfWeek: 4 },
+      { key: "2027-08", label: "Sierpień 2027", days: 31, startDayOfWeek: 7 },
+      { key: "2027-09", label: "Wrzesień 2027", days: 30, startDayOfWeek: 3 }
+    ];
+
+    const DEFAULT_CATEGORIES = [
+      { id: 'cat-housing', name: 'Mieszkanie / Czynsz', color: 'emerald' },
+      { id: 'cat-utilities', name: 'Media (Prąd, Gaz, Woda)', color: 'blue' },
+      { id: 'cat-internet', name: 'Internet i Telefon', color: 'cyan' },
+      { id: 'cat-subs', name: 'Subskrypcje i Rozrywka', color: 'indigo' },
+      { id: 'cat-loans', name: 'Kredyty i Pożyczki', color: 'rose' },
+      { id: 'cat-insurance', name: 'Ubezpieczenia', color: 'amber' },
+      { id: 'cat-transport', name: 'Transport / Samochód', color: 'slate' }
+    ];
+
+    const DEFAULT_ACCOUNTS = [
+      'Konto Główne (ROR)',
+      'Konto Oszczędnościowe',
+      'Karta Kredytowa',
+      'BLIK / Gotówka'
+    ];
+
+    const INITIAL_SAMPLE_BILLS = [
+      { id: 'b-1', monthKey: '2026-09', name: 'Czynsz do spółdzielni', amount: 850.00, day: 10, category: 'Mieszkanie / Czynsz', account: 'Konto Główne (ROR)', status: 'PAID', notes: 'Płatne z góry' },
+      { id: 'b-2', monthKey: '2026-09', name: 'Energia elektryczna (PGE/Tauron)', amount: 245.50, day: 15, category: 'Media (Prąd, Gaz, Woda)', account: 'Konto Główne (ROR)', status: 'PENDING', notes: 'Prognoza za 2 m-ce' },
+      { id: 'b-3', monthKey: '2026-09', name: 'Światłowód + TV', amount: 89.99, day: 5, category: 'Internet i Telefon', account: 'Konto Główne (ROR)', status: 'PAID', notes: 'Autopłatność aktywna' },
+      { id: 'b-4', monthKey: '2026-09', name: 'Abonament komórkowy', amount: 55.00, day: 12, category: 'Internet i Telefon', account: 'Konto Główne (ROR)', status: 'PAID', notes: 'Pakiet 5G' },
+      { id: 'b-5', monthKey: '2026-09', name: 'Rata kredytu hipotecznego', amount: 2150.00, day: 20, category: 'Kredyty i Pożyczki', account: 'Konto Główne (ROR)', status: 'PENDING', notes: 'Stała stopa' },
+      { id: 'b-6', monthKey: '2026-09', name: 'Netflix + Spotify Duo', amount: 85.00, day: 18, category: 'Subskrypcje i Rozrywka', account: 'Karta Kredytowa', status: 'AUTOPAY', notes: 'Pobierane z karty' },
+      { id: 'b-7', monthKey: '2026-09', name: 'Ubezpieczenie OC/AC auta', amount: 140.00, day: 25, category: 'Ubezpieczenia', account: 'Konto Główne (ROR)', status: 'PENDING', notes: 'Rata 3 z 4' },
+      { id: 'b-8', monthKey: '2026-09', name: 'Karta miejska / bilet okresowy', amount: 110.00, day: 1, category: 'Transport / Samochód', account: 'BLIK / Gotówka', status: 'PAID', notes: 'Ważny do końca miesiąca' }
+    ];
+
+    const STORAGE_PREFIX = 'moje_platnosci_2026_2027_';
+
+    let state = {
+      currentMonthKey: '2026-09',
+      categories: [],
+      accounts: [],
+      bills: [],
+      currency: 'zł',
+      activeTab: 'dashboard',
+      syncCode: 'DOM-2026',
+      lastSyncedAt: 0
+    };
+
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+    let db = null;
+    let auth = null;
+    let authUser = null;
+    let unsubscribeFirestore = null;
+    let isRemoteUpdate = false;
+
+    async function initCloudSync() {
+      try {
+        // Read URL hash for pairing link (e.g., #sync=DOM-1234)
+        if (window.location.hash && window.location.hash.startsWith('#sync=')) {
+          const hashKey = window.location.hash.replace('#sync=', '').trim().toUpperCase();
+          if (hashKey) {
+            state.syncCode = hashKey;
+            localStorage.setItem(STORAGE_PREFIX + 'syncCode', hashKey);
+          }
+        }
+
+        const inputCode = document.getElementById('inputSyncCode');
+        if (inputCode) inputCode.value = state.syncCode;
+
+        if (typeof __firebase_config === 'undefined') {
+          updateCloudUIState(false, 'Tryb offline (lokalny)');
+          return;
+        }
+
+        const firebaseConfig = JSON.parse(__firebase_config);
+        const fbApp = initializeApp(firebaseConfig);
+        auth = getAuth(fbApp);
+        db = getFirestore(fbApp);
+
+        // RULE 3: Auth Before Queries
+        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+          await signInWithCustomToken(auth, __initial_auth_token);
+        } else {
+          await signInAnonymously(auth);
+        }
+
+        authUser = auth.currentUser;
+        if (!authUser) {
+          updateCloudUIState(false, 'Brak autoryzacji');
+          return;
+        }
+
+        connectToCloudProfile(state.syncCode);
+      } catch (err) {
+        console.warn('Inicjalizacja chmury:', err);
+        updateCloudUIState(false, 'Działa lokalnie');
+      }
+    }
+
+    function connectToCloudProfile(syncCode) {
+      if (!db || !authUser) return;
+      if (unsubscribeFirestore) {
+        unsubscribeFirestore();
+        unsubscribeFirestore = null;
+      }
+
+      // RULE 1: Strict public path /artifacts/{appId}/public/data/{collectionName}/{documentId}
+      const safeCode = (syncCode || 'DOM-2026').replace(/[^a-zA-Z0-9_-]/g, '').toUpperCase() || 'DOM-2026';
+      const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'planners', safeCode);
+
+      updateCloudUIState(true, `Połączono (${safeCode})`);
+
+      // Real-time snapshot with error callback (CRITICAL)
+      unsubscribeFirestore = onSnapshot(docRef, (docSnap) => {
+        if (docSnap.exists()) {
+          const remoteData = docSnap.data();
+          if (remoteData.updatedAt && remoteData.updatedAt > state.lastSyncedAt) {
+            isRemoteUpdate = true;
+            if (remoteData.categories) state.categories = remoteData.categories;
+            if (remoteData.accounts) state.accounts = remoteData.accounts;
+            if (remoteData.bills) state.bills = remoteData.bills;
+            if (remoteData.currency) state.currency = remoteData.currency;
+            state.lastSyncedAt = remoteData.updatedAt;
+
+            saveState(false); // save locally without re-pushing
+            refreshUI();
+            isRemoteUpdate = false;
+
+            const timeEl = document.getElementById('syncTimeStatus');
+            if (timeEl) timeEl.textContent = 'Zsynchronizowano ' + new Date().toLocaleTimeString();
+            showToast('Zaktualizowano dane z chmury.', 'info');
+          }
+        } else {
+          // Document does not exist yet for this code: upload current state
+          pushStateToCloud();
+        }
+      }, (err) => {
+        console.error('Błąd synchronizacji:', err);
+        updateCloudUIState(false, 'Błąd połączenia');
+      });
+    }
+
+    async function pushStateToCloud() {
+      if (!db || !authUser || isRemoteUpdate) return;
+      try {
+        const safeCode = (state.syncCode || 'DOM-2026').replace(/[^a-zA-Z0-9_-]/g, '').toUpperCase() || 'DOM-2026';
+        const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'planners', safeCode);
+        const timestamp = Date.now();
+        state.lastSyncedAt = timestamp;
+
+        await setDoc(docRef, {
+          syncCode: safeCode,
+          categories: state.categories,
+          accounts: state.accounts,
+          bills: state.bills,
+          currency: state.currency,
+          updatedAt: timestamp
+        }, { merge: true });
+
+        const timeEl = document.getElementById('syncTimeStatus');
+        if (timeEl) timeEl.textContent = 'Zapisano w chmurze ' + new Date().toLocaleTimeString();
+      } catch (err) {
+        console.warn('Nie udało się zapisać do chmury:', err);
+      }
+    }
+
+    function updateCloudUIState(isConnected, text) {
+      const dot = document.getElementById('cloudStatusDot');
+      const label = document.getElementById('cloudStatusLabel');
+      const modalStatus = document.getElementById('syncModalStatus');
+
+      if (dot) {
+        dot.className = isConnected 
+          ? 'w-2 h-2 rounded-full bg-emerald-500 animate-pulse' 
+          : 'w-2 h-2 rounded-full bg-slate-400';
+      }
+      if (label) label.textContent = isConnected ? 'Połączono' : 'Chmura';
+      if (modalStatus) modalStatus.textContent = text;
+    }
+
+    function loadState() {
+      try {
+        const savedCategories = localStorage.getItem(STORAGE_PREFIX + 'categories');
+        const savedAccounts = localStorage.getItem(STORAGE_PREFIX + 'accounts');
+        const savedBills = localStorage.getItem(STORAGE_PREFIX + 'bills');
+        const savedCurrency = localStorage.getItem(STORAGE_PREFIX + 'currency');
+        const savedSyncCode = localStorage.getItem(STORAGE_PREFIX + 'syncCode');
+
+        state.categories = savedCategories ? JSON.parse(savedCategories) : DEFAULT_CATEGORIES;
+        state.accounts = savedAccounts ? JSON.parse(savedAccounts) : DEFAULT_ACCOUNTS;
+        state.bills = savedBills ? JSON.parse(savedBills) : INITIAL_SAMPLE_BILLS;
+        state.currency = savedCurrency || 'zł';
+        state.syncCode = savedSyncCode || ('DOM-' + Math.floor(1000 + Math.random() * 9000));
+      } catch (err) {
+        state.categories = DEFAULT_CATEGORIES;
+        state.accounts = DEFAULT_ACCOUNTS;
+        state.bills = INITIAL_SAMPLE_BILLS;
+        state.currency = 'zł';
+        state.syncCode = 'DOM-2026';
+      }
+    }
+
+    function saveState(pushToCloud = true) {
+      try {
+        localStorage.setItem(STORAGE_PREFIX + 'categories', JSON.stringify(state.categories));
+        localStorage.setItem(STORAGE_PREFIX + 'accounts', JSON.stringify(state.accounts));
+        localStorage.setItem(STORAGE_PREFIX + 'bills', JSON.stringify(state.bills));
+        localStorage.setItem(STORAGE_PREFIX + 'currency', state.currency);
+        localStorage.setItem(STORAGE_PREFIX + 'syncCode', state.syncCode);
+
+        if (pushToCloud) {
+          pushStateToCloud();
+        }
+      } catch (err) {
+        showToast('Nie udało się zapisać w LocalStorage.', 'warning');
+      }
+    }
+
+    function applySyncCode() {
+      const input = document.getElementById('inputSyncCode');
+      const val = input ? input.value.trim().toUpperCase() : '';
+      if (!val) {
+        showToast('Wpisz poprawny kod synchronizacji.', 'warning');
+        return;
+      }
+      state.syncCode = val;
+      localStorage.setItem(STORAGE_PREFIX + 'syncCode', val);
+      connectToCloudProfile(val);
+      showToast(`Przełączono na profil: ${val}`, 'success');
+      closeModal('syncModal');
+    }
+
+    function generateRandomSyncCode() {
+      const newCode = 'DOM-' + Math.floor(1000 + Math.random() * 9000);
+      const input = document.getElementById('inputSyncCode');
+      if (input) input.value = newCode;
+      state.syncCode = newCode;
+      localStorage.setItem(STORAGE_PREFIX + 'syncCode', newCode);
+      connectToCloudProfile(newCode);
+      showToast(`Nowy kod profilu: ${newCode}`, 'info');
+    }
+
+    function copySyncLink() {
+      const code = state.syncCode || 'DOM-2026';
+      const cleanUrl = window.location.href.split('#')[0];
+      const link = cleanUrl + '#sync=' + encodeURIComponent(code);
+
+      const tempInput = document.createElement('input');
+      tempInput.value = link;
+      document.body.appendChild(tempInput);
+      tempInput.select();
+      document.execCommand('copy');
+      document.body.removeChild(tempInput);
+
+      showToast('Skopiowano link parujący! Otwórz go na telefonie.', 'success');
+    }
+
+    function formatMoney(amount) {
+      return Number(amount || 0).toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' ' + state.currency;
+    }
+
+    function initMonthSelector() {
+      const select = document.getElementById('selectCurrentMonth');
+      if (!select) return;
+      select.innerHTML = '';
+      MONTHS_CYCLE.forEach(m => {
+        const opt = document.createElement('option');
+        opt.value = m.key;
+        opt.textContent = m.label;
+        if (m.key === state.currentMonthKey) opt.selected = true;
+        select.appendChild(opt);
+      });
+
+      select.onchange = (e) => {
+        setMonth(e.target.value);
+      };
+
+      const btnPrev = document.getElementById('btnPrevMonth');
+      if (btnPrev) {
+        btnPrev.onclick = () => {
+          const idx = MONTHS_CYCLE.findIndex(m => m.key === state.currentMonthKey);
+          if (idx > 0) {
+            setMonth(MONTHS_CYCLE[idx - 1].key);
+          } else {
+            showToast('To jest pierwszy miesiąc w harmonogramie (Wrzesień 2026).', 'info');
+          }
+        };
+      }
+
+      const btnNext = document.getElementById('btnNextMonth');
+      if (btnNext) {
+        btnNext.onclick = () => {
+          const idx = MONTHS_CYCLE.findIndex(m => m.key === state.currentMonthKey);
+          if (idx < MONTHS_CYCLE.length - 1) {
+            setMonth(MONTHS_CYCLE[idx + 1].key);
+          } else {
+            showToast('To jest ostatni miesiąc w harmonogramie (Wrzesień 2027).', 'info');
+          }
+        };
+      }
+    }
+
+    function setMonth(monthKey) {
+      state.currentMonthKey = monthKey;
+      const select = document.getElementById('selectCurrentMonth');
+      if (select) select.value = monthKey;
+      const monthObj = MONTHS_CYCLE.find(m => m.key === monthKey);
+      if (monthObj) {
+        const dashLabel = document.getElementById('dashMonthLabel');
+        const calLabel = document.getElementById('calHeaderMonth');
+        if (dashLabel) dashLabel.textContent = monthObj.label;
+        if (calLabel) calLabel.textContent = monthObj.label;
+      }
+      refreshUI();
+    }
+
+    function switchTab(tabId) {
+      state.activeTab = tabId;
+      const tabs = ['dashboard', 'transactions', 'calendar', 'yearly', 'customize'];
+      tabs.forEach(t => {
+        const sec = document.getElementById('section-' + t);
+        const btn = document.getElementById('tab-' + t);
+        if (sec && btn) {
+          if (t === tabId) {
+            sec.classList.remove('hidden');
+            btn.classList.add('border-emerald-600', 'text-emerald-700');
+            btn.classList.remove('border-transparent', 'text-slate-500');
+          } else {
+            sec.classList.add('hidden');
+            btn.classList.remove('border-emerald-600', 'text-emerald-700');
+            btn.classList.add('border-transparent', 'text-slate-500');
+          }
+        }
+      });
+      refreshUI();
+    }
+
+    function calculateKPIs() {
+      const currentBills = state.bills.filter(b => b.monthKey === state.currentMonthKey);
+      const totalCount = currentBills.length;
+      const totalAmount = currentBills.reduce((acc, b) => acc + Number(b.amount || 0), 0);
+      
+      const paidBills = currentBills.filter(b => b.status === 'PAID' || b.status === 'AUTOPAY');
+      const paidAmount = paidBills.reduce((acc, b) => acc + Number(b.amount || 0), 0);
+      
+      const pendingBills = currentBills.filter(b => b.status === 'PENDING');
+      const pendingAmount = pendingBills.reduce((acc, b) => acc + Number(b.amount || 0), 0);
+
+      const percent = totalAmount > 0 ? Math.round((paidAmount / totalAmount) * 100) : 0;
+
+      const kpiTotal = document.getElementById('kpiTotal');
+      const kpiTotalSub = document.getElementById('kpiTotalSub');
+      const kpiPaid = document.getElementById('kpiPaid');
+      const kpiPaidSub = document.getElementById('kpiPaidSub');
+      const kpiProgressBar = document.getElementById('kpiProgressBar');
+      const kpiRemaining = document.getElementById('kpiRemaining');
+      const kpiRemainingSub = document.getElementById('kpiRemainingSub');
+      const kpiNextDue = document.getElementById('kpiNextDue');
+      const kpiNextDueSub = document.getElementById('kpiNextDueSub');
+      const tabCountBadge = document.getElementById('tabCountBadge');
+
+      if (kpiTotal) kpiTotal.textContent = formatMoney(totalAmount);
+      if (kpiTotalSub) kpiTotalSub.textContent = `Liczba pozycji: ${totalCount}`;
+      if (kpiPaid) kpiPaid.textContent = formatMoney(paidAmount);
+      if (kpiPaidSub) kpiPaidSub.innerHTML = `<span>${paidBills.length} opłaconych</span> <span>${percent}%</span>`;
+      if (kpiProgressBar) kpiProgressBar.style.width = `${percent}%`;
+      if (kpiRemaining) kpiRemaining.textContent = formatMoney(pendingAmount);
+      if (kpiRemainingSub) kpiRemainingSub.textContent = `${pendingBills.length} płatności oczekujących`;
+
+      const sortedPending = [...pendingBills].sort((a, b) => Number(a.day) - Number(b.day));
+      if (kpiNextDue && kpiNextDueSub) {
+        if (sortedPending.length > 0) {
+          const next = sortedPending[0];
+          kpiNextDue.textContent = `${next.day}. dzień: ${next.name}`;
+          kpiNextDueSub.textContent = `Kwota: ${formatMoney(next.amount)}`;
+        } else if (totalCount > 0) {
+          kpiNextDue.textContent = 'Wszystko opłacone! 🎉';
+          kpiNextDueSub.textContent = 'Brak zaległości w tym miesiącu';
+        } else {
+          kpiNextDue.textContent = 'Brak wpisów';
+          kpiNextDueSub.textContent = 'Dodaj swój pierwszy rachunek';
+        }
+      }
+
+      if (tabCountBadge) tabCountBadge.textContent = totalCount;
+    }
+
+    function renderCategoryBreakdown() {
+      const container = document.getElementById('categoryBreakdownContainer');
+      if (!container) return;
+      container.innerHTML = '';
+
+      const currentBills = state.bills.filter(b => b.monthKey === state.currentMonthKey);
+      const totalAmount = currentBills.reduce((acc, b) => acc + Number(b.amount || 0), 0);
+
+      if (currentBills.length === 0) {
+        container.innerHTML = `<div class="text-xs text-slate-400 py-4 text-center">Brak danych dla tego miesiąca. Dodaj płatności w zakładce Miesięczne Płatności.</div>`;
+        return;
+      }
+
+      const map = {};
+      state.categories.forEach(c => map[c.name] = { total: 0, count: 0, color: c.color });
+
+      currentBills.forEach(b => {
+        if (!map[b.category]) {
+          map[b.category] = { total: 0, count: 0, color: 'slate' };
+        }
+        map[b.category].total += Number(b.amount || 0);
+        map[b.category].count += 1;
+      });
+
+      const sortedCats = Object.keys(map)
+        .filter(cat => map[cat].total > 0)
+        .sort((a, b) => map[b].total - map[a].total);
+
+      if (sortedCats.length === 0) {
+        container.innerHTML = `<div class="text-xs text-slate-400 py-4 text-center">Wszystkie wydatki mają kwotę 0 zł.</div>`;
+        return;
+      }
+
+      sortedCats.forEach(catName => {
+        const item = map[catName];
+        const pct = totalAmount > 0 ? Math.round((item.total / totalAmount) * 100) : 0;
+        
+        const row = document.createElement('div');
+        row.className = 'space-y-1';
+        row.innerHTML = `
+          <div class="flex items-center justify-between text-xs font-semibold">
+            <span class="text-slate-700">${escapeHTML(catName)} <span class="text-slate-400 font-normal">(${item.count})</span></span>
+            <span class="text-slate-900 font-bold">${formatMoney(item.total)} <span class="text-slate-400 font-normal">(${pct}%)</span></span>
+          </div>
+          <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+            <div class="bg-emerald-600 h-full rounded-full transition-all duration-300" style="width: ${pct}%"></div>
+          </div>
+        `;
+        container.appendChild(row);
+      });
+    }
+
+    function renderUpcomingDashboard() {
+      const container = document.getElementById('dashUpcomingContainer');
+      if (!container) return;
+      container.innerHTML = '';
+
+      const currentBills = state.bills.filter(b => b.monthKey === state.currentMonthKey);
+      const pending = currentBills.filter(b => b.status === 'PENDING').sort((a, b) => Number(a.day) - Number(b.day));
+
+      if (pending.length === 0) {
+        container.innerHTML = `
+          <div class="p-4 bg-emerald-50 rounded-xl border border-emerald-100 text-center">
+            <svg class="w-7 h-7 text-emerald-600 mx-auto mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <p class="text-xs font-bold text-emerald-800">Wszystkie rachunki są opłacone!</p>
+            <p class="text-[11px] text-emerald-600 mt-0.5">Brak zbliżających się terminów do zapłaty.</p>
+          </div>
+        `;
+        return;
+      }
+
+      pending.slice(0, 5).forEach(b => {
+        const card = document.createElement('div');
+        card.className = 'flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200/80 hover:bg-slate-100/80 transition';
+        card.innerHTML = `
+          <div class="flex items-center gap-2.5">
+            <div class="w-9 h-9 rounded-lg bg-amber-100 text-amber-800 font-bold text-xs flex flex-col items-center justify-center leading-tight">
+              <span>${b.day}</span>
+              <span class="text-[9px] uppercase font-normal">dzień</span>
+            </div>
+            <div>
+              <h5 class="text-xs font-bold text-slate-900 leading-tight">${escapeHTML(b.name)}</h5>
+              <span class="text-[11px] text-slate-500">${escapeHTML(b.category)}</span>
+            </div>
+          </div>
+          <div class="text-right">
+            <div class="text-xs font-bold text-slate-900">${formatMoney(b.amount)}</div>
+            <button onclick="toggleBillStatus('${b.id}')" class="text-[10px] font-semibold text-emerald-600 hover:text-emerald-800 underline">
+              Oznacz: Zapłacone
+            </button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function renderTransactionsTable() {
+      const tbody = document.getElementById('billsTableBody');
+      const emptyState = document.getElementById('tableEmptyState');
+      if (!tbody) return;
+
+      const searchInput = document.getElementById('billSearch');
+      const statusFilterEl = document.getElementById('filterStatus');
+      const catFilterEl = document.getElementById('filterCategory');
+
+      const search = (searchInput ? searchInput.value : '').toLowerCase().trim();
+      const statusFilter = statusFilterEl ? statusFilterEl.value : 'ALL';
+      const catFilter = catFilterEl ? catFilterEl.value : 'ALL';
+
+      let bills = state.bills.filter(b => b.monthKey === state.currentMonthKey);
+      bills.sort((a, b) => Number(a.day) - Number(b.day));
+
+      if (search) {
+        bills = bills.filter(b => b.name.toLowerCase().includes(search) || (b.notes && b.notes.toLowerCase().includes(search)));
+      }
+      if (statusFilter !== 'ALL') {
+        bills = bills.filter(b => b.status === statusFilter);
+      }
+      if (catFilter !== 'ALL') {
+        bills = bills.filter(b => b.category === catFilter);
+      }
+
+      tbody.innerHTML = '';
+
+      if (bills.length === 0) {
+        if (emptyState) emptyState.classList.remove('hidden');
+      } else {
+        if (emptyState) emptyState.classList.add('hidden');
+        bills.forEach(bill => {
+          const tr = document.createElement('tr');
+          tr.className = 'hover:bg-slate-50/80 transition-colors border-b border-slate-100 group';
+
+          let statusBadge = '';
+          if (bill.status === 'PAID') {
+            statusBadge = `<span class="badge-pill bg-emerald-100 text-emerald-800 border border-emerald-200">Opłacone</span>`;
+          } else if (bill.status === 'AUTOPAY') {
+            statusBadge = `<span class="badge-pill bg-indigo-100 text-indigo-800 border border-indigo-200">Autopłatność</span>`;
+          } else {
+            statusBadge = `<span class="badge-pill bg-amber-100 text-amber-800 border border-amber-200">Do zapłaty</span>`;
+          }
+
+          const isChecked = (bill.status === 'PAID' || bill.status === 'AUTOPAY');
+
+          tr.innerHTML = `
+            <td class="py-3 px-4 text-center">
+              <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="toggleBillStatus('${bill.id}')" title="Przełącz status" class="w-4 h-4 rounded-md text-emerald-600 focus:ring-emerald-500 border-slate-300 cursor-pointer" />
+            </td>
+            <td class="py-3 px-4">
+              <div class="font-bold text-slate-900">${escapeHTML(bill.name)}</div>
+              ${bill.notes ? `<div class="text-[11px] text-slate-400 truncate max-w-xs">${escapeHTML(bill.notes)}</div>` : ''}
+            </td>
+            <td class="py-3 px-4">
+              <span class="text-xs bg-slate-100 text-slate-700 px-2.5 py-1 rounded-md border border-slate-200">${escapeHTML(bill.category || 'Ogólne')}</span>
+            </td>
+            <td class="py-3 px-4 font-semibold text-slate-700">
+              ${bill.day}. dzień
+            </td>
+            <td class="py-3 px-4 text-xs text-slate-600">
+              ${escapeHTML(bill.account || 'Konto Główne')}
+            </td>
+            <td class="py-3 px-4 text-right font-bold text-slate-900">
+              ${formatMoney(bill.amount)}
+            </td>
+            <td class="py-3 px-4">
+              ${statusBadge}
+            </td>
+            <td class="py-3 px-4 text-center">
+              <div class="flex items-center justify-center gap-1 opacity-80 group-hover:opacity-100">
+                <button onclick="editBill('${bill.id}')" title="Edytuj" class="p-1 text-slate-500 hover:text-emerald-600 rounded-md hover:bg-slate-100 transition">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                </button>
+                <button onclick="deleteBillConfirm('${bill.id}')" title="Usuń" class="p-1 text-slate-500 hover:text-red-600 rounded-md hover:bg-slate-100 transition">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                </button>
+              </div>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+
+      const totalSum = bills.reduce((acc, b) => acc + Number(b.amount || 0), 0);
+      const paidSum = bills.filter(b => b.status === 'PAID' || b.status === 'AUTOPAY').reduce((acc, b) => acc + Number(b.amount || 0), 0);
+      const pendingSum = bills.filter(b => b.status === 'PENDING').reduce((acc, b) => acc + Number(b.amount || 0), 0);
+
+      const fCounts = document.getElementById('tableFooterCounts');
+      const fPaid = document.getElementById('tableFooterPaid');
+      const fPending = document.getElementById('tableFooterPending');
+      const fSum = document.getElementById('tableFooterSum');
+
+      if (fCounts) fCounts.textContent = `Pozycji: ${bills.length} | Opłaconych: ${bills.filter(b => b.status === 'PAID' || b.status === 'AUTOPAY').length}`;
+      if (fPaid) fPaid.textContent = formatMoney(paidSum);
+      if (fPending) fPending.textContent = formatMoney(pendingSum);
+      if (fSum) fSum.textContent = formatMoney(totalSum);
+    }
+
+    function renderCalendar() {
+      const grid = document.getElementById('calendarGrid');
+      if (!grid) return;
+      grid.innerHTML = '';
+
+      const monthInfo = MONTHS_CYCLE.find(m => m.key === state.currentMonthKey) || MONTHS_CYCLE[0];
+      const bills = state.bills.filter(b => b.monthKey === state.currentMonthKey);
+
+      const dayMap = {};
+      bills.forEach(b => {
+        const d = Number(b.day);
+        if (!dayMap[d]) dayMap[d] = [];
+        dayMap[d].push(b);
+      });
+
+      const blankSlots = monthInfo.startDayOfWeek - 1;
+      for (let i = 0; i < blankSlots; i++) {
+        const blank = document.createElement('div');
+        blank.className = 'min-h-[85px] sm:min-h-[105px] bg-slate-50/50 rounded-xl border border-slate-100/80 p-2';
+        grid.appendChild(blank);
+      }
+
+      for (let day = 1; day <= monthInfo.days; day++) {
+        const dayBills = dayMap[day] || [];
+        const cell = document.createElement('div');
+        cell.className = 'min-h-[85px] sm:min-h-[105px] bg-white rounded-xl border border-slate-200 p-2 hover:shadow-xs transition flex flex-col justify-between';
+
+        let innerContent = `
+          <div class="flex items-center justify-between mb-1">
+            <span class="text-xs font-bold ${dayBills.length > 0 ? 'text-slate-900 bg-slate-100 px-1.5 py-0.5 rounded-md' : 'text-slate-400'}">${day}</span>
+            ${dayBills.length > 0 ? `<span class="text-[10px] font-semibold text-slate-500">${dayBills.length}</span>` : ''}
+          </div>
+          <div class="space-y-1 overflow-y-auto max-h-[60px] sm:max-h-[75px]">
+        `;
+
+        dayBills.forEach(b => {
+          let dotColor = 'bg-amber-500';
+          if (b.status === 'PAID') dotColor = 'bg-emerald-500';
+          if (b.status === 'AUTOPAY') dotColor = 'bg-indigo-500';
+
+          innerContent += `
+            <div onclick="editBill('${b.id}')" title="${escapeHTML(b.name)} - ${formatMoney(b.amount)}" class="cursor-pointer text-[10px] sm:text-[11px] font-medium text-slate-700 bg-slate-50 hover:bg-slate-100 border border-slate-200/80 rounded px-1.5 py-0.5 truncate flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full ${dotColor} shrink-0"></span>
+              <span class="truncate">${escapeHTML(b.name)}</span>
+            </div>
+          `;
+        });
+
+        innerContent += `</div>`;
+        cell.innerHTML = innerContent;
+        grid.appendChild(cell);
+      }
+    }
+
+    function renderYearlyOverview() {
+      const tbody = document.getElementById('yearlySummaryTableBody');
+      const tfoot = document.getElementById('yearlySummaryFooter');
+      if (!tbody || !tfoot) return;
+      tbody.innerHTML = '';
+
+      let totalYearBillsCount = 0;
+      let totalYearSum = 0;
+      let totalYearPaid = 0;
+      let totalYearPending = 0;
+
+      MONTHS_CYCLE.forEach(m => {
+        const monthBills = state.bills.filter(b => b.monthKey === m.key);
+        const count = monthBills.length;
+        const total = monthBills.reduce((acc, b) => acc + Number(b.amount || 0), 0);
+        const paid = monthBills.filter(b => b.status === 'PAID' || b.status === 'AUTOPAY').reduce((acc, b) => acc + Number(b.amount || 0), 0);
+        const pending = monthBills.filter(b => b.status === 'PENDING').reduce((acc, b) => acc + Number(b.amount || 0), 0);
+        const pct = total > 0 ? Math.round((paid / total) * 100) : (count > 0 ? 100 : 0);
+
+        totalYearBillsCount += count;
+        totalYearSum += total;
+        totalYearPaid += paid;
+        totalYearPending += pending;
+
+        const isSelectedMonth = m.key === state.currentMonthKey;
+
+        const tr = document.createElement('tr');
+        tr.className = `hover:bg-slate-50 transition ${isSelectedMonth ? 'bg-emerald-50/50 font-semibold' : ''}`;
+        tr.innerHTML = `
+          <td class="py-3 px-4 font-bold text-slate-800 flex items-center gap-2">
+            ${isSelectedMonth ? '<span class="w-2 h-2 rounded-full bg-emerald-600"></span>' : ''}
+            ${m.label}
+          </td>
+          <td class="py-3 px-4 text-center text-slate-600">${count}</td>
+          <td class="py-3 px-4 text-right font-bold text-slate-900">${formatMoney(total)}</td>
+          <td class="py-3 px-4 text-right text-emerald-600 font-semibold">${formatMoney(paid)}</td>
+          <td class="py-3 px-4 text-right text-amber-600 font-semibold">${formatMoney(pending)}</td>
+          <td class="py-3 px-4 text-center">
+            <div class="flex items-center justify-center gap-2">
+              <div class="w-16 bg-slate-200 h-1.5 rounded-full overflow-hidden">
+                <div class="bg-emerald-500 h-full rounded-full" style="width: ${pct}%"></div>
+              </div>
+              <span class="text-xs text-slate-600 font-bold">${pct}%</span>
+            </div>
+          </td>
+          <td class="py-3 px-4 text-center">
+            <button onclick="setMonth('${m.key}'); switchTab('transactions');" class="text-xs font-semibold px-2.5 py-1 bg-white hover:bg-slate-100 border border-slate-300 rounded-lg transition">
+              Otwórz
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      const yearPct = totalYearSum > 0 ? Math.round((totalYearPaid / totalYearSum) * 100) : 0;
+      tfoot.innerHTML = `
+        <td class="py-3 px-4">RAZEM (13 MIESIĘCY)</td>
+        <td class="py-3 px-4 text-center">${totalYearBillsCount}</td>
+        <td class="py-3 px-4 text-right text-base font-extrabold text-slate-900">${formatMoney(totalYearSum)}</td>
+        <td class="py-3 px-4 text-right text-emerald-700">${formatMoney(totalYearPaid)}</td>
+        <td class="py-3 px-4 text-right text-amber-700">${formatMoney(totalYearPending)}</td>
+        <td class="py-3 px-4 text-center">${yearPct}% zrealizowane</td>
+        <td class="py-3 px-4 text-center">-</td>
+      `;
+    }
+
+    function renderCustomizeLists() {
+      const catContainer = document.getElementById('categoriesList');
+      if (catContainer) {
+        catContainer.innerHTML = '';
+        state.categories.forEach(cat => {
+          const item = document.createElement('div');
+          item.className = 'flex items-center justify-between p-2.5 rounded-xl border border-slate-200 bg-slate-50/50';
+          item.innerHTML = `
+            <div class="flex items-center gap-2 text-sm font-semibold text-slate-800">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+              ${escapeHTML(cat.name)}
+            </div>
+            <button onclick="deleteCategoryConfirm('${cat.id}')" class="text-slate-400 hover:text-red-600 p-1 transition" title="Usuń kategorię">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+            </button>
+          `;
+          catContainer.appendChild(item);
+        });
+      }
+
+      const accContainer = document.getElementById('accountsList');
+      if (accContainer) {
+        accContainer.innerHTML = '';
+        state.accounts.forEach(acc => {
+          const item = document.createElement('div');
+          item.className = 'flex items-center justify-between p-2.5 rounded-xl border border-slate-200 bg-slate-50/50';
+          item.innerHTML = `
+            <div class="flex items-center gap-2 text-sm font-semibold text-slate-800">
+              <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
+              ${escapeHTML(acc)}
+            </div>
+            <button onclick="deleteAccountConfirm('${escapeHTML(acc)}')" class="text-slate-400 hover:text-red-600 p-1 transition" title="Usuń konto">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+            </button>
+          `;
+          accContainer.appendChild(item);
+        });
+      }
+
+      populateCategorySelects();
+      populateAccountSelects();
+    }
+
+    function populateCategorySelects() {
+      const formCat = document.getElementById('formBillCategory');
+      const filterCat = document.getElementById('filterCategory');
+      if (!formCat || !filterCat) return;
+      
+      const currentFilterVal = filterCat.value;
+      
+      formCat.innerHTML = '';
+      filterCat.innerHTML = '<option value="ALL">Wszystkie kategorie</option>';
+
+      state.categories.forEach(c => {
+        const opt1 = document.createElement('option');
+        opt1.value = c.name;
+        opt1.textContent = c.name;
+        formCat.appendChild(opt1);
+
+        const opt2 = document.createElement('option');
+        opt2.value = c.name;
+        opt2.textContent = c.name;
+        filterCat.appendChild(opt2);
+      });
+
+      if (currentFilterVal) filterCat.value = currentFilterVal;
+    }
+
+    function populateAccountSelects() {
+      const formAcc = document.getElementById('formBillAccount');
+      if (!formAcc) return;
+      formAcc.innerHTML = '';
+      state.accounts.forEach(a => {
+        const opt = document.createElement('option');
+        opt.value = a;
+        opt.textContent = a;
+        formAcc.appendChild(opt);
+      });
+    }
+
+    function openModal(modalId) {
+      const m = document.getElementById(modalId);
+      if (m) m.classList.remove('hidden');
+    }
+
+    function closeModal(modalId) {
+      const m = document.getElementById(modalId);
+      if (m) m.classList.add('hidden');
+      if (modalId === 'addBillModal') {
+        const form = document.getElementById('billForm');
+        if (form) form.reset();
+        const idInput = document.getElementById('formBillId');
+        if (idInput) idInput.value = '';
+        const titleEl = document.getElementById('billModalTitle');
+        if (titleEl) titleEl.textContent = 'Dodaj Nową Płatność';
+      }
+    }
+
+    function editBill(billId) {
+      const bill = state.bills.find(b => b.id === billId);
+      if (!bill) return;
+
+      document.getElementById('formBillId').value = bill.id;
+      document.getElementById('formBillName').value = bill.name;
+      document.getElementById('formBillAmount').value = bill.amount;
+      document.getElementById('formBillDay').value = bill.day;
+      document.getElementById('formBillCategory').value = bill.category;
+      document.getElementById('formBillAccount').value = bill.account;
+      document.getElementById('formBillStatus').value = bill.status;
+      document.getElementById('formBillNotes').value = bill.notes || '';
+
+      document.getElementById('billModalTitle').textContent = 'Edytuj Płatność';
+      openModal('addBillModal');
+    }
+
+    function handleBillSubmit(event) {
+      event.preventDefault();
+      const id = document.getElementById('formBillId').value;
+      const name = document.getElementById('formBillName').value.trim();
+      const amount = parseFloat(document.getElementById('formBillAmount').value);
+      const day = parseInt(document.getElementById('formBillDay').value, 10);
+      const category = document.getElementById('formBillCategory').value;
+      const account = document.getElementById('formBillAccount').value;
+      const status = document.getElementById('formBillStatus').value;
+      const notes = document.getElementById('formBillNotes').value.trim();
+
+      if (!name || isNaN(amount) || isNaN(day)) {
+        showToast('Wypełnij poprawnie wszystkie wymagane pola.', 'warning');
+        return;
+      }
+
+      if (id) {
+        const billIndex = state.bills.findIndex(b => b.id === id);
+        if (billIndex !== -1) {
+          state.bills[billIndex] = {
+            ...state.bills[billIndex],
+            name,
+            amount,
+            day,
+            category,
+            account,
+            status,
+            notes
+          };
+          showToast('Płatność została zaktualizowana.', 'success');
+        }
+      } else {
+        const newBill = {
+          id: 'bill_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+          monthKey: state.currentMonthKey,
+          name,
+          amount,
+          day,
+          category,
+          account,
+          status,
+          notes
+        };
+        state.bills.push(newBill);
+        showToast('Nowa płatność została dodana.', 'success');
+      }
+
+      saveState(true);
+      closeModal('addBillModal');
+      refreshUI();
+    }
+
+    function toggleBillStatus(billId) {
+      const bill = state.bills.find(b => b.id === billId);
+      if (!bill) return;
+
+      if (bill.status === 'PAID') {
+        bill.status = 'PENDING';
+        showToast(`Oznaczono "${bill.name}" jako do zapłaty.`, 'info');
+      } else {
+        bill.status = 'PAID';
+        showToast(`Oznaczono "${bill.name}" jako opłacone!`, 'success');
+      }
+
+      saveState(true);
+      refreshUI();
+    }
+
+    function deleteBillConfirm(billId) {
+      const bill = state.bills.find(b => b.id === billId);
+      if (!bill) return;
+
+      showConfirmModal(
+        'Usunąć płatność?',
+        `Czy na pewno chcesz usunąć "${bill.name}" (${formatMoney(bill.amount)})?`,
+        () => {
+          state.bills = state.bills.filter(b => b.id !== billId);
+          saveState(true);
+          refreshUI();
+          showToast('Płatność została usunięta.', 'info');
+        }
+      );
+    }
+
+    function copyCurrentMonthBillsToNext() {
+      const currentIdx = MONTHS_CYCLE.findIndex(m => m.key === state.currentMonthKey);
+      if (currentIdx === -1 || currentIdx >= MONTHS_CYCLE.length - 1) {
+        showToast('Nie można skopiować dalej – to ostatni miesiąc cyklu (Wrzesień 2027).', 'warning');
+        return;
+      }
+
+      const nextMonth = MONTHS_CYCLE[currentIdx + 1];
+      const currentMonthBills = state.bills.filter(b => b.monthKey === state.currentMonthKey);
+
+      if (currentMonthBills.length === 0) {
+        showToast('Obecny miesiąc nie zawiera żadnych rachunków do skopiowania.', 'warning');
+        return;
+      }
+
+      showConfirmModal(
+        'Kopiowanie rachunków',
+        `Czy skopiować ${currentMonthBills.length} pozycji do miesiąca: ${nextMonth.label}? Zostaną one utworzone ze statusem "Do zapłaty".`,
+        () => {
+          currentMonthBills.forEach(b => {
+            state.bills.push({
+              id: 'bill_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+              monthKey: nextMonth.key,
+              name: b.name,
+              amount: b.amount,
+              day: Math.min(b.day, nextMonth.days),
+              category: b.category,
+              account: b.account,
+              status: 'PENDING',
+              notes: b.notes || ''
+            });
+          });
+
+          saveState(true);
+          showToast(`Pomyślnie skopiowano płatności do ${nextMonth.label}!`, 'success');
+          setMonth(nextMonth.key);
+        }
+      );
+    }
+
+    function handleCategorySubmit(e) {
+      e.preventDefault();
+      const name = document.getElementById('formCategoryName').value.trim();
+      const color = document.getElementById('formCategoryColor').value;
+
+      if (!name) return;
+      if (state.categories.some(c => c.name.toLowerCase() === name.toLowerCase())) {
+        showToast('Taka kategoria już istnieje.', 'warning');
+        return;
+      }
+
+      state.categories.push({
+        id: 'cat_' + Date.now(),
+        name,
+        color
+      });
+
+      saveState(true);
+      closeModal('addCategoryModal');
+      renderCustomizeLists();
+      showToast(`Kategoria "${name}" została dodana.`, 'success');
+    }
+
+    function deleteCategoryConfirm(catId) {
+      const cat = state.categories.find(c => c.id === catId);
+      if (!cat) return;
+
+      showConfirmModal(
+        'Usunąć kategorię?',
+        `Czy na pewno chcesz usunąć kategorię "${cat.name}"? Istniejące rachunki zachowają jej nazwę.`,
+        () => {
+          state.categories = state.categories.filter(c => c.id !== catId);
+          saveState(true);
+          renderCustomizeLists();
+          showToast('Kategoria została usunięta.', 'info');
+        }
+      );
+    }
+
+    function handleAccountSubmit(e) {
+      e.preventDefault();
+      const name = document.getElementById('formAccountName').value.trim();
+
+      if (!name) return;
+      if (state.accounts.some(a => a.toLowerCase() === name.toLowerCase())) {
+        showToast('Taka metoda płatności już istnieje.', 'warning');
+        return;
+      }
+
+      state.accounts.push(name);
+      saveState(true);
+      closeModal('addAccountModal');
+      renderCustomizeLists();
+      showToast(`Dodano metodę: "${name}".`, 'success');
+    }
+
+    function deleteAccountConfirm(accName) {
+      showConfirmModal(
+        'Usunąć metodę / konto?',
+        `Czy na pewno chcesz usunąć "${accName}"?`,
+        () => {
+          state.accounts = state.accounts.filter(a => a !== accName);
+          saveState(true);
+          renderCustomizeLists();
+          showToast('Metoda została usunięta.', 'info');
+        }
+      );
+    }
+
+    function updateCurrency(val) {
+      state.currency = val.trim() || 'zł';
+      saveState(true);
+      refreshUI();
+      showToast(`Zaktualizowano walutę na "${state.currency}".`, 'success');
+    }
+
+    function resetDefaultsConfirm() {
+      showConfirmModal(
+        'Przywrócić ustawienia domyślne?',
+        'Przywróci to domyślne kategorie, konta oraz początkowe rachunki przykładowe.',
+        () => {
+          state.categories = [...DEFAULT_CATEGORIES];
+          state.accounts = [...DEFAULT_ACCOUNTS];
+          state.bills = [...INITIAL_SAMPLE_BILLS];
+          state.currency = 'zł';
+          saveState(true);
+          refreshUI();
+          showToast('Przywrócono domyślne wartości.', 'info');
+        }
+      );
+    }
+
+    function exportPlannerCSV() {
+      const monthObj = MONTHS_CYCLE.find(m => m.key === state.currentMonthKey) || { label: state.currentMonthKey };
+      const currentBills = state.bills.filter(b => b.monthKey === state.currentMonthKey);
+
+      let csv = 'Miesiac;Dzien;Nazwa Platnosci;Kategoria;Konto;Kwota;Waluta;Status;Notatki\n';
+
+      currentBills.forEach(b => {
+        const row = [
+          monthObj.label,
+          b.day,
+          `"${b.name.replace(/"/g, '""')}"`,
+          `"${(b.category || '').replace(/"/g, '""')}"`,
+          `"${(b.account || '').replace(/"/g, '""')}"`,
+          b.amount.toString().replace('.', ','),
+          state.currency,
+          b.status,
+          `"${(b.notes || '').replace(/"/g, '""')}"`
+        ];
+        csv += row.join(';') + '\n';
+      });
+
+      downloadFile(csv, `Planner_Platnosci_${state.currentMonthKey}.csv`, 'text/csv;charset=utf-8;');
+      showToast(`Pobrano plik CSV dla: ${monthObj.label}`, 'success');
+    }
+
+    function exportYearlySummaryCSV() {
+      let csv = 'Miesiac;Liczba_Pozycji;Suma_Calkowita;Oplacone;Do_Zaplaty;Waluta;Realizacja_Procent\n';
+
+      MONTHS_CYCLE.forEach(m => {
+        const monthBills = state.bills.filter(b => b.monthKey === m.key);
+        const count = monthBills.length;
+        const total = monthBills.reduce((acc, b) => acc + Number(b.amount || 0), 0);
+        const paid = monthBills.filter(b => b.status === 'PAID' || b.status === 'AUTOPAY').reduce((acc, b) => acc + Number(b.amount || 0), 0);
+        const pending = monthBills.filter(b => b.status === 'PENDING').reduce((acc, b) => acc + Number(b.amount || 0), 0);
+        const pct = total > 0 ? Math.round((paid / total) * 100) : (count > 0 ? 100 : 0);
+
+        csv += [
+          m.label,
+          count,
+          total.toFixed(2).replace('.', ','),
+          paid.toFixed(2).replace('.', ','),
+          pending.toFixed(2).replace('.', ','),
+          state.currency,
+          `${pct}%`
+        ].join(';') + '\n';
+      });
+
+      downloadFile(csv, 'Planner_Platnosci_Roczny_2026_2027.csv', 'text/csv;charset=utf-8;');
+      showToast('Pobrano roczny raport CSV!', 'success');
+    }
+
+    function downloadFile(content, fileName, mimeType) {
+      const blob = new Blob(['\uFEFF' + content], { type: mimeType });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    function escapeHTML(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    let confirmCallback = null;
+    function showConfirmModal(title, message, onConfirm) {
+      document.getElementById('confirmModalTitle').textContent = title;
+      document.getElementById('confirmModalMessage').textContent = message;
+      confirmCallback = onConfirm;
+      openModal('confirmModal');
+    }
+
+    const cancelBtn = document.getElementById('confirmBtnCancel');
+    if (cancelBtn) {
+      cancelBtn.onclick = () => {
+        closeModal('confirmModal');
+        confirmCallback = null;
+      };
+    }
+
+    const actionBtn = document.getElementById('confirmBtnAction');
+    if (actionBtn) {
+      actionBtn.onclick = () => {
+        if (typeof confirmCallback === 'function') {
+          confirmCallback();
+        }
+        closeModal('confirmModal');
+        confirmCallback = null;
+      };
+    }
+
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toastContainer');
+      if (!container) return;
+      const toast = document.createElement('div');
+
+      let icon = '';
+      let borderClass = 'border-slate-200';
+      if (type === 'success') {
+        icon = '<svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>';
+        borderClass = 'border-emerald-200 bg-emerald-50 text-emerald-900';
+      } else if (type === 'warning') {
+        icon = '<svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>';
+        borderClass = 'border-amber-200 bg-amber-50 text-amber-900';
+      } else {
+        icon = '<svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>';
+        borderClass = 'border-blue-200 bg-blue-50 text-blue-900';
+      }
+
+      toast.className = `pointer-events-auto flex items-center gap-2 px-3.5 py-2.5 rounded-xl shadow-lg border text-xs font-semibold ${borderClass} transition-all duration-300 transform translate-y-2 opacity-0`;
+      toast.innerHTML = `<span>${icon}</span> <span>${escapeHTML(message)}</span>`;
+
+      container.appendChild(toast);
+
+      requestAnimationFrame(() => {
+        toast.classList.remove('translate-y-2', 'opacity-0');
+      });
+
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+
+    function refreshUI() {
+      calculateKPIs();
+      renderCategoryBreakdown();
+      renderUpcomingDashboard();
+      renderTransactionsTable();
+      renderCalendar();
+      renderYearlyOverview();
+      renderCustomizeLists();
+    }
+
+    let deferredPwaPrompt = null;
+
+    function initPWA() {
+      const manifestData = {
+        name: "Planner Płatności 2026-2027",
+        short_name: "Planner 26/27",
+        description: "Aplikacja do zarządzania płatnościami i rachunkami w cyklu Wrzesień 2026 - Wrzesień 2027",
+        start_url: window.location.href,
+        display: "standalone",
+        background_color: "#f8fafc",
+        theme_color: "#059669",
+        icons: [
+          {
+            src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='24' fill='%23059669'/%3E%3Cpath d='M30 45 L45 60 L70 35' fill='none' stroke='white' stroke-width='10' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E",
+            sizes: "192x192 512x512",
+            type: "image/svg+xml",
+            purpose: "any maskable"
+          }
+        ]
+      };
+
+      const manifestBlob = new Blob([JSON.stringify(manifestData)], { type: 'application/json' });
+      const manifestUrl = URL.createObjectURL(manifestBlob);
+      const manifestEl = document.getElementById('manifest-placeholder');
+      if (manifestEl) manifestEl.setAttribute('href', manifestUrl);
+
+      if ('serviceWorker' in navigator) {
+        const swScript = `
+          const CACHE_NAME = 'planner-pwa-v1';
+          self.addEventListener('install', (e) => self.skipWaiting());
+          self.addEventListener('activate', (e) => e.waitUntil(clients.claim()));
+          self.addEventListener('fetch', (e) => e.respondWith(fetch(e.request).catch(() => caches.match(e.request))));
+        `;
+        const swBlob = new Blob([swScript], { type: 'application/javascript' });
+        const swUrl = URL.createObjectURL(swBlob);
+        navigator.serviceWorker.register(swUrl).catch(() => {});
+      }
+
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPwaPrompt = e;
+        const btn = document.getElementById('btnPwaInstall');
+        if (btn) {
+          btn.classList.remove('hidden');
+          btn.classList.add('animate-pulse');
+        }
+      });
+
+      window.addEventListener('appinstalled', () => {
+        deferredPwaPrompt = null;
+        showToast('Planner został pomyślnie zainstalowany jako aplikacja!', 'success');
+        const btn = document.getElementById('btnPwaInstall');
+        if (btn) btn.innerHTML = '<span>✓ Zainstalowano</span>';
+      });
+    }
+
+    function handlePwaInstallClick() {
+      const isIos = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+
+      if (isStandalone) {
+        showToast('Aplikacja jest już uruchomiona w trybie pełnoekranowym PWA.', 'info');
+        return;
+      }
+
+      if (deferredPwaPrompt) {
+        deferredPwaPrompt.prompt();
+        deferredPwaPrompt.userChoice.then((choiceResult) => {
+          if (choiceResult.outcome === 'accepted') {
+            showToast('Rozpoczęto instalację plannera...', 'success');
+          }
+          deferredPwaPrompt = null;
+        });
+      } else if (isIos) {
+        openModal('pwaIosModal');
+      } else {
+        showToast('Aby zainstalować: kliknij ikonę instalacji w pasku adresu przeglądarki (lub menu → "Zainstaluj")', 'info');
+      }
+    }
+
+    window.switchTab = switchTab;
+    window.setMonth = setMonth;
+    window.openModal = openModal;
+    window.closeModal = closeModal;
+    window.editBill = editBill;
+    window.handleBillSubmit = handleBillSubmit;
+    window.toggleBillStatus = toggleBillStatus;
+    window.deleteBillConfirm = deleteBillConfirm;
+    window.copyCurrentMonthBillsToNext = copyCurrentMonthBillsToNext;
+    window.handleCategorySubmit = handleCategorySubmit;
+    window.deleteCategoryConfirm = deleteCategoryConfirm;
+    window.handleAccountSubmit = handleAccountSubmit;
+    window.deleteAccountConfirm = deleteAccountConfirm;
+    window.updateCurrency = updateCurrency;
+    window.resetDefaultsConfirm = resetDefaultsConfirm;
+    window.exportPlannerCSV = exportPlannerCSV;
+    window.exportYearlySummaryCSV = exportYearlySummaryCSV;
+    window.renderTransactionsTable = renderTransactionsTable;
+    window.handlePwaInstallClick = handlePwaInstallClick;
+    window.applySyncCode = applySyncCode;
+    window.generateRandomSyncCode = generateRandomSyncCode;
+    window.copySyncLink = copySyncLink;
+
+    function initApp() {
+      loadState();
+      initMonthSelector();
+      initPWA();
+      const currInput = document.getElementById('currencySymbolInput');
+      if (currInput) currInput.value = state.currency;
+      setMonth(state.currentMonthKey);
+      initCloudSync();
+    }
+
+    initApp();
+  </script>
+</body>
+</html>
